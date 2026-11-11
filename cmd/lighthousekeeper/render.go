@@ -84,7 +84,7 @@ func (a *app) drawSea(dst *ebiten.Image) {
 		y := 445 + float64(i*13)
 		x := math.Mod(float64(i*149)+seconds*8, 1110) - 90
 		alpha := uint8(23 + i%4*8)
-		ebitenutil.DrawLine(dst, x*2, y*2, (x+65)*2, (y+math.Sin(seconds+i)*1.2)*2, color.RGBA{190, 226, 226, alpha})
+		ebitenutil.DrawLine(dst, x*2, y*2, (x+65)*2, (y+math.Sin(seconds+float64(i))*1.2)*2, color.RGBA{190, 226, 226, alpha})
 	}
 }
 func (a *app) drawFrame(dst *ebiten.Image) {
