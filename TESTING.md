@@ -13,14 +13,23 @@ PASS
 
 Headless tests run without a renderer, native window or hardware audio. They exercise complete crossing and deterministic replay, speed difference under illumination, beam geometry, fog, sighting notice/chase, chime/window rearm, lantern thresholds, scheduled check-ins, rest and extra-night rules, desk timing and persistence safety. These tests do not prove that the Ebitengine application compiles on Go 1.25, nor that a Linux desktop can actually launch it.
 
-## Integration and hardening gates — outstanding until verified
+## GitHub engineering and launch gates observed — 11 November 2026
 
-- [ ] Go 1.25+/Ebitengine 2.10.6 module resolution and `go mod tidy` contract.
-- [ ] Full `go vet ./...`.
-- [ ] Full `go test -race -count=1 ./...`.
-- [ ] Linux/amd64 and Linux/arm64 production builds.
-- [ ] Embedded asset decode and procedural audio tests under the build toolchain.
-- [ ] Production executable Xvfb graphical-launch smoke test.
+- **CI success:** [run 42962738531](https://github.com/jonathanselby/lighthouse-keeper/actions/runs/42962738531), source commit `46e44f0a884e74305b5ad578c4ff2398e4e7beb6`: module contract, gofmt, vet, race-enabled tests, Linux/amd64 and Linux/ARM64 builds, and named core acceptance all passed.
+- **CI reconfirmation:** [run 42962933707](https://github.com/jonathanselby/lighthouse-keeper/actions/runs/42962933707), source/workflow commit `193a10ee255e43d44c6ad50857f2fd8750779784`, passed.
+- **Production release candidate:** [run 42962933696](https://github.com/jonathanselby/lighthouse-keeper/actions/runs/42962933696), source/workflow commit `193a10ee255e43d44c6ad50857f2fd8750779784`, passed full validation, native amd64 build, Xvfb GUI smoke launch, permission-preserving tar archive verification and Actions artifact upload.
+- **Binary asset integrity:** all eight embedded art assets and the approved source PNG in GitHub were compared byte-for-byte using Git blob SHA against the local approved files.
+- **Initial failed CI:** first module run failed because go.mod indentation was noncanonical; next run passed module/format but failed before compilation because the binary assets were missing. After asset upload the first complete graphical compile found a `float64 + int` error in the water line expression; corrected to `float64(i)`. No gameplay mechanic changed.
+- **Actual GUI gameplay and UAT:** NOT observed by this automated gate. Six seconds of successful Xvfb startup is not a completed gameplay or visual test.
+
+## Integration and hardening gates — checklist with evidence
+
+- [x] Go 1.25+/Ebitengine 2.10.6 module resolution and `go mod tidy` contract (green GitHub CI).
+- [x] Full `go vet ./...` (green GitHub CI).
+- [x] Full `go test -race -count=1 ./...` (green GitHub CI).
+- [x] Linux/amd64 and Linux/arm64 CI production builds.
+- [x] Embedded asset decode and procedural audio tests under the Go 1.25 CI toolchain.
+- [x] Production executable Xvfb graphical-launch smoke test (run 42962933696).
 - [ ] Full-screen gameplay, visual transitions, Book, Harbour Log, Rest, Desk mode and save recovery manually observed.
 - [ ] Actual 60 Hz hardware frame-time evidence and input responsiveness.
 - [ ] Actual 120 Hz hardware frame-time evidence on a verified 120 Hz display.
