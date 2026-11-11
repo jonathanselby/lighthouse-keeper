@@ -1,0 +1,50 @@
+name: Build Release Candidate
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build-release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.x'
+      - name: Validate source
+        run: |
+          set -euo pipefail
+          go mod tidy
+          git diff --exit-code -- go.mod go.sum
+          test -z "$(gofmt -l ./cmd ./internal)"
+          go vet ./...
+          go test -race -count=1 ./...
+      - name: Build native Linux binary
+        run: |
+          set -euo pipefail
+          mkdir -p release
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -ldflags='-s -w' -o release/Lighthouse-Keeper ./cmd/lighthousekeeper
+          chmod 755 release/Lighthouse-Keeper
+      - name: Smoke-test graphical startup
+        run: |
+          set -euo pipefail
+          export LIBGL_ALWAYS_SOFTWARE=1
+          set +e
+          timeout 6s xvfb-run -a release/Lighthouse-Keeper >release-launch.log 2>&1
+          rc=$?
+          set -e
+          cat release-launch.log
+          if [ "$rc" -ne 124 ]; then echo "Launch exited with status $rc"; exit 1; fi
+      - name: Package verified executable
+        run: |
+          set -euo pipefail
+          tar -C release -czf Lighthouse-Keeper-v0.1.0-linux-x86_64.tar.gz Lighthouse-Keeper
+          mkdir verify
+          tar -C verify -xzf Lighthouse-Keeper-v0.1.0-linux-x86_64.tar.gz
+          test -x verify/Lighthouse-Keeper
+          sha256sum Lighthouse-Keeper-v0.1.0-linux-x86_64.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Lighthouse-Keeper-v0.1.0-linux-x86_64
+          path: Lighthouse-Keeper-v0.1.0-linux-x86_64.tar.gz
+          retention-days: 30

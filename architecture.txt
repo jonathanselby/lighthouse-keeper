@@ -1,0 +1,47 @@
+LIGHTHOUSE KEEPER V0.1 — ENGINEERING CONTRACT
+=============================================
+                 KEYBOARD + LOCAL DATE
+                          |
+                          v
+             +-------------------------+
+             | cmd/lighthousekeeper    |
+             | Ebitengine adapter      |
+             | input, screen and sound |
+             | embed art, JSON I/O     |
+             +-----------+-------------+
+                         | Input (injected time)
+                         v
+             +-------------------------+
+             | internal/game           |
+             | ONE Game, 60 Hz rules   |
+             +----------+--------------+
+                        |
+           +------------+-------------------+
+           |                 |               |
+         NIGHT            DESK BELL          SAVE
+           |                 |               |
+   five crossings      injected elapsed    bounded local
+   beam and fog        answer / next ring  JSON records
+   sightings           end / log           atomic rename
+   bell check-ins
+   prediction and log
+           |
+           v
+         events --------------> event-to-sound / particles
+           |
+           v
+       read-only state --------> premium layered renderer
+                                 latest-state visual projection
+                                 2x logical HD canvas
+
+SOURCE ART (offline only)
+-------------------------
+assets-source/concept-approved.png + export.py
+                     |
+                     v
+8 embedded original images (game ships no runtime art engine)
+
+DELIVERATELY ABSENT
+-------------------
+no ECS / scene graph / physics / UI framework / event bus / database
+no network / telemetry / AI / account / analytics / plugin runtime
