@@ -1,6 +1,10 @@
 name: Build Release Candidate
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/release-build.yml
 permissions:
   contents: read
 jobs:
