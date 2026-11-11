@@ -4,14 +4,10 @@ on:
   push:
     branches: [main]
     paths:
-      - .github/workflows/release-build.yml
-      - cmd/lighthousekeeper/**
-      - internal/game/**
-      - VERSION
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/release-build.yml
+      - '.github/workflows/release-build.yml'
+      - 'cmd/lighthousekeeper/**'
+      - 'internal/game/**'
+      - 'VERSION'
 permissions:
   contents: read
 jobs:
