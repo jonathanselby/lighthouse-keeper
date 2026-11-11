@@ -6,18 +6,18 @@
 - [x] EDD v0.2 retained in `EDD.md` as the current design baseline.
 - [x] Linux desktop, full-screen 4:3, offline, keyboard-first scope.
 - [x] No network, telemetry, accounts, advertising or runtime AI.
-- [ ] Source and documents reconciled to the final accepted gameplay implementation.
+- [x] Code-derived EDD and comparison published against source commit `193a10ee255e43d44c6ad50857f2fd8750779784`; physical product acceptance remains open.
 
 ## Engineering gate
 
 - [x] Headless game-core tests passed locally under Go 1.23.2 (module-off fallback; *not* full CI).
-- [ ] Go 1.25 / pinned dependency module contract green in GitHub CI.
-- [ ] `gofmt` clean in CI.
-- [ ] `go vet ./...` green in CI.
-- [ ] `go test -race -count=1 ./...` green in CI.
-- [ ] Linux/amd64 and Linux/arm64 builds green in CI.
-- [ ] Embedded art and procedural sound decode tests green in CI.
-- [ ] Actual Linux GUI launch smoke test green.
+- [x] Go 1.25 / pinned dependency module contract green in GitHub CI (run 42962933707).
+- [x] `gofmt` clean in CI.
+- [x] `go vet ./...` green in CI.
+- [x] `go test -race -count=1 ./...` green in CI.
+- [x] Linux/amd64 and Linux/arm64 builds green in CI.
+- [x] Embedded art and procedural sound decode tests green in CI.
+- [x] Linux GUI launch smoke test green under Xvfb (release candidate run 42962933696; not full UAT).
 
 ## Product acceptance
 
@@ -35,16 +35,16 @@
 
 ## Independent evidence
 
-- [ ] Source, tests and assets final; release source-changing commit recorded.
-- [ ] `generated/EDD.md` independently recovered from that commit.
-- [ ] `generated/COMPARISON.md` reconciles design and observed source.
+- [x] Current source/tests/assets snapshot recorded at commit `193a10ee255e43d44c6ad50857f2fd8750779784`; subsequent changes to this implementation require regenerated evidence.
+- [x] `generated/EDD.md` written from direct source inspection and pinned to that commit.
+- [x] `generated/COMPARISON.md` records implementation matches, changes and open physical evidence.
 - [ ] `TESTING.md` includes UAT and hardening failures, not only successes.
 
 ## Publication
 
-- [ ] GitHub repository source and binary asset blobs verified.
-- [ ] CI and release-build workflow green.
-- [ ] Linux executable built, smoke-tested and packaged.
+- [x] GitHub source present and all nine image blob hashes match local originals.
+- [x] CI and release-build workflow green (runs 42962933707 and 42962933696).
+- [x] Linux executable built, smoke-tested and packaged as GitHub Actions artifact; not yet attached to a public Release.
 - [ ] Release tag `v0.1.0` created only after code/evidence gates.
 - [ ] Release binary attached to GitHub Release, not committed to source history.
 - [ ] GitHub About and topics completed.
