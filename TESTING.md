@@ -39,6 +39,18 @@ Headless tests run without a renderer, native window or hardware audio. They exe
 - [ ] Constrained-hardware Garage benchmark (CPU, RAM, GPU memory, frame rate, executable size, scene entity caps).
 - [ ] Original layered artwork approved against five cinematic quality references.
 
+## Graphical visual inspection — Linux Xvfb, 2026-11-11
+
+The production Linux x86-64 executable from release-candidate workflow 42962933696 was unpacked, executed in a 1920×1080 virtual display using software OpenGL, and photographed at Title and at two points during Crossing 1. It stayed running and showed a functioning screen transition from Title → Predict → Night via keyboard input.
+
+**Observed success:** the title painting displays at correct 4:3 aspect ratio with black pillarboxing; keyboard input advances screens; the night scene draws the beam, sea, lamp, crossing HUD, moving boat and sightings.
+
+**Observed visual-quality failure:** the current night scene is substantially flatter and more schematic than the five approved premium painterly references, especially the water, illustrated sightings, lighthouse and boat sprites. The title menu is functional but uses generic rectangular panels. These visuals are implementation placeholders and do **not** satisfy the locked premium graphics acceptance criterion.
+
+**Additional usability risk:** the first part of a crossing may position the boat near the HUD/sky region, where readability is compromised. The photographic snapshots are not sufficient to certify all seeded paths or whether noticing and return prompts remain readable at every boat position.
+
+**Next gate:** replace or materially improve the active scene's hero art and layout while preserving the core engine, then repeat captured-screen inspection and hardware frame pacing measurements. No high-refresh performance claim is made from these software-rendered screenshots.
+
 ## Test evidence required at release
 
 Name the hardware, display refresh/resolution, OS, actual measured FPS/TPS and frame times rather than assuming them. Capture all screens and a representative night. When an issue is found, record the initial failure, smallest corrective change and retest result here. Do not check a release gate merely because a script exists.
