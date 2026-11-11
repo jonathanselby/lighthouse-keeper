@@ -1,6 +1,6 @@
 # Lighthouse Keeper — Code-Derived Engineering Design Document
 
-**Evidence source commit:** `193a10ee255e43d44c6ad50857f2fd8750779784`  
+**Evidence source commit:** `f5029e2999223a2410848931fbaf8ef7f0c8c342`  
 **Method:** independent source inspection, using the Garage codebase-to-EDD evidence discipline  
 **Date:** 2026-11-11  
 **Status:** compiled and smoke-tested implementation; human UAT and physical performance measurements outstanding
@@ -89,3 +89,9 @@ There is no general game engine, ECS, event bus, physics system, UI framework, n
 ## 10. Conclusion
 
 The recovered application is a small deterministic Go game with a separate Ebitengine presentation layer and bounded persistence. Its correctness/build/startup gates have evidence; its premium graphics and high-refresh targets remain physical acceptance criteria.
+
+## Premium artwork implementation reconciliation — candidate f5029e29
+
+The visual adapter now loads **12 runtime raster images** (two JPG scenic images, ten PNG sprites/overlays), including lantern, glow, shimmer and a nine-slice UI rail. It pre-slices the rail and six sighting tiles at startup; `drawSea` places a single 1920×1440 composited ocean painting and sixteen bounded glint draws. Dynamic scene objects, beam, fog, book, log, and other screens remain Ebitengine-owned presentation decisions. Offline art preparation is in `assets-source/export_premium.py`, with three original project source illustrations. Gameplay rules in `internal/game` remain the authoritative core.
+
+**Observed running implementation:** CI `42974831234` and release smoke `42974831280` succeeded. An independently captured native title and night screenshot exposed visible horizontal seams in the artwork compositing, so the artistically approved build is **not** yet achieved. Only visual composition requires further correction; no gameplay scope or security change is justified. Human UAT and native 60/120 Hz performance measurement remain open.

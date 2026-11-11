@@ -1,6 +1,6 @@
 # Lighthouse Keeper — Design / Implementation Comparison
 
-**Evidence source commit:** `193a10ee255e43d44c6ad50857f2fd8750779784`  
+**Evidence source commit:** `f5029e2999223a2410848931fbaf8ef7f0c8c342`  
 **Design baseline:** PRD v0.2 and EDD v0.2  
 **Generated:** 2026-11-11
 
@@ -49,3 +49,16 @@ The attached five concept artworks are visual benchmarks, not proof of gameplay 
 ## Result
 
 **ENGINEERING IMPLEMENTATION MATCH AND VERIFIED LINUX STARTUP; PRODUCT UAT OPEN.** No further architecture is justified by observed CI failures. Visual and physical acceptance must be judged separately.
+
+## Verified premium candidate — update
+
+| Design area | Actual evidence | Status |
+| --- | --- | --- |
+| Painterly runtime assets | 12 embedded images plus three original source illustrations; source commit `f5029e2999223a2410848931fbaf8ef7f0c8c342` | MATCH — assets present |
+| Runtime integrity | Green Go CI [42974831234](https://github.com/jonathanselby/lighthouse-keeper/actions/runs/42974831234) | MATCH |
+| Linux graphical release candidate | Green build and Xvfb launch [42974831280](https://github.com/jonathanselby/lighthouse-keeper/actions/runs/42974831280) | MATCH — launch only |
+| Cohesive premium game composition | Captured running night shows prominent horizontal seams between composited ocean bands and awkward foreground alignment | **DEVIATION — visual acceptance failed** |
+| Native 60/120 Hz smoothness | No real-refresh-rate hardware measurements | OPEN |
+| Full child and homework UAT | No evidence of completed sessions | OPEN |
+
+**Decision:** retain the candidate and working backend, correct only the artwork/presentation layer, then rebuild and capture new executable screenshots before approving the public release. This comparison describes the actual candidate, not a future implementation.
