@@ -1,30 +1,40 @@
-# Lighthouse Keeper — Artwork and rights register
+# Lighthouse Keeper — Artwork, provenance and export
 
-## Provenance
+**Visual revision:** painterly presentation pass, following the first release-candidate graphical UAT rejection. **Status:** implementation candidate; premium quality and fluidity require on-device approval.
 
-- `assets-source/concept-approved.png`: one of the five original cinematic concepts generated for Lighthouse Keeper in the ChatGPT working session on 11 November 2026 and approved by the project owner. It is not stock imagery or an unrelated commercial game's art.
-- `cmd/lighthousekeeper/assets/title_art.jpg`: colour-graded, 4:3-cropped export of that original concept; used only as a static title backdrop (where the baked illustrative beam is not gameplay).
-- `cmd/lighthousekeeper/assets/seascape.jpg`: independently authored layered sky and ocean, with a moon sampled from the original concept; no baked-in moving gameplay object.
-- `lighthouse.png`, `boat.png`, `sightings.png`, `parchment.png`, `beam.png`, `fog.png`: original procedural illustration exports authored specifically for the game with offline Pillow code.
-- Typography: `goregular` and `gobold` from the Go font sources in `golang.org/x/image`. No proprietary font files are bundled.
-- Audio: original mathematically generated PCM cues and an ambient wave bed; no sampled third-party music or audio files.
+## Originals and rights
 
-## Offline reproducibility
+Three source studies are original ChatGPT-generated project illustrations created for Lighthouse Keeper on 11 November 2026, rather than third-party game art or web images:
 
-With Python 3 and Pillow installed:
+- `assets-source/concept-approved.png` — owner's approved lighthouse, moonlight, sea and harbour direction; retained as the title-image source.
+- `assets-source/approved-ocean-study.png` — original painterly coastal study used as texture and character-isolation source for the interactive sea, lantern and boat.
+- `assets-source/original-ui-study.png` — original illustrated scene-and-book study; the six subject paintings supply the Sightings Book and drifting sightings. Any wording visible in the source study is not gameplay policy.
 
-```sh
-python assets-source/export.py
+`assets-source/export_premium.py` assembles and masks these **offline** into the twelve embedded runtime images. The painterly sea is newly composed from multiple illustration regions. The moving boat, spotlight, sightings and lantern are **not** baked into that ocean image: they are separate sprites controlled by real game state.
+
+The runtime sprites are ordinary optimised JPEG and PNG files, inspectable in GitHub. The game does **not** call image-generation services or execute Python at runtime. Fonts use Go's standard redistributable font modules. Audio is generated in Go from original mathematical cues.
+
+## Reproducible build
+
+From the repository root, with Python 3, Pillow and NumPy available on the **authoring** machine:
+
+```text
+python assets-source/export_premium.py
 ```
 
-The export script reads `assets-source/concept-approved.png` and writes exactly the eight runtime files into `cmd/lighthousekeeper/assets/`. At runtime, the game needs no Python, Pillow, image-generation service, asset-server or external download.
+The script is seeded; source originals, coordinates, quality and output sizes are fixed. Production is otherwise self-contained. Do not commit obsolete prototypes, base64 image copies or transient mockups.
 
-The source artwork and shipped assets are bundled in Git for auditability; a user releases the **compiled binary** rather than asking players to run the export tool.
+Shipped files in `cmd/lighthousekeeper/assets/`:
 
-## Asset/resource budget
+- `seascape.jpg`, `title_art.jpg` — opaque 1920 × 1440 backdrops;
+- `lighthouse.png`, `boat.png`, `sightings.png`, `lantern.png` — painted interactive objects / miniature status lights;
+- `beam.png`, `fog.png`, `glow.png`, `shimmer.png` — reusable bounded soft lighting/water overlays;
+- `parchment.png`, `ui_rail.png` — reusable illustrated book and brass/navy UI treatments.
 
-The initial embedded art total is less than 2 MiB compressed (plus approximately 2.7 MiB of offline source concept). The decoded GPU textures, actual executable, frame times and runtime RAM must be measured in an integrated build. Do not substitute these file sizes for that evidence. The core never opens an art file per frame, and no authoring image is decoded during play.
+Ebitengine handles texture drawing and scaling. One reusable nine-slice panel is prepared at startup, never sliced again during steady-state drawing. The visual-only water glints are sixteen bounded translated draws, not a fluid simulation. Sighting illustrations reuse one six-frame atlas.
 
-## Quality gate
+## Budget and acceptance
 
-The six sighting illustrations are separate collectible identities. All movement, beam illumination and fog are render-only transforms over genuine gameplay state. The complete art pass needs visual comparison, multi-display screenshots and child observation before being called premium or final.
+The game keeps the PRD's full 960 × 720 logical space, while raster artwork renders to a 1920 × 1440 target. Painterly detail is prioritised over an arbitrary byte limit. Record packed bytes, decoded texture memory and native 60/120 Hz frame-time evidence after graphical CI and hardware UAT; these cannot be deduced from the illustration alone.
+
+Before public release, capture actual running footage of all screens and compare against the five approved painterly references. Confirm the beam's visually illuminated boat matches `WithinBeam` in all movement directions, fog does not obscure the player, the harbour remains readable, and every sighting is identifiable and collectible. Only real hardware can prove high-refresh fluidity.

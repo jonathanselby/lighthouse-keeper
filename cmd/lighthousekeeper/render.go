@@ -54,39 +54,96 @@ func (a *app) smallText(dst *ebiten.Image, s string, x, y float64) {
 	a.drawText(dst, s, x, y, a.small, ivory, true)
 }
 func (a *app) panel(dst *ebiten.Image, x, y, w, h float64) {
-	ebitenutil.DrawRect(dst, x*2, y*2, w*2, h*2, color.RGBA{9, 27, 43, 220})
-	vector.StrokeRect(dst, float32(x*2+3), float32(y*2+3), float32(w*2-6), float32(h*2-6), 2, color.RGBA{233, 185, 113, 195}, true)
-}
-func (a *app) lamp(dst *ebiten.Image) {
-	img := a.images["lighthouse.png"]
-	op := &ebiten.DrawImageOptions{Filter: ebiten.FilterLinear}
-	op.GeoM.Translate(-205, -95)
-	op.GeoM.Translate(game.LampX*2, game.LampY*2)
-	dst.DrawImage(img, op)
-	// A thin halo over the known lamp centre, not gameplay illumination.
-	rad := float32(16 + 3*math.Sin(float64(time.Now().UnixNano())/1e9*1.2))
-	vector.DrawFilledCircle(dst, float32(game.LampX*2), float32(game.LampY*2), rad, color.RGBA{255, 226, 151, 95}, true)
-}
-func (a *app) spotlight(dst *ebiten.Image, angle, halfWidth float64) {
-	img := a.images["beam.png"]
-	op := &ebiten.DrawImageOptions{Filter: ebiten.FilterLinear}
-	op.GeoM.Translate(-245, -850)
-	op.GeoM.Scale(1.44*(halfWidth/(12*math.Pi/180)), 1.92)
-	op.GeoM.Rotate(angle)
-	op.GeoM.Translate(game.LampX*2, game.LampY*2)
-	dst.DrawImage(img, op)
-}
-func (a *app) drawSea(dst *ebiten.Image) {
-	dst.DrawImage(a.images["seascape.jpg"], nil)
-	// Low-cost, very subtle water motion layered over the static painted sea.
-	seconds := float64(time.Now().UnixNano()) / 1e9
-	for i := 0; i < 15; i++ {
-		y := 445 + float64(i*13)
-		x := math.Mod(float64(i*149)+seconds*8, 1110) - 90
-		alpha := uint8(23 + i%4*8)
-		ebitenutil.DrawLine(dst, x*2, y*2, (x+65)*2, (y+math.Sin(seconds+float64(i))*1.2)*2, color.RGBA{190, 226, 226, alpha})
+	src := a.images["ui_rail.png"]
+	if src == nil {
+		return
+	}
+	sw, sh := src.Bounds().Dx(), src.Bounds().Dy()
+	xm := [4]int{0, 52, sw - 52, sw}
+	ym := [4]int{0, 32, sh - 32, sh}
+	dw, dh := w*renderScale, h*renderScale
+	xd := [4]float64{0, 52, dw - 52, dw}
+	yd := [4]float64{0, 32, dh - 32, dh}
+	for j := 0; j < 3; j++ {
+		for i := 0; i < 3; i++ {
+			part := a.rail[j*3+i]
+			op := &ebiten.DrawImageOptions{Filter: ebiten.FilterLinear}
+			op.GeoM.Scale((xd[i+1]-xd[i])/float64(xm[i+1]-xm[i]),
+				(yd[j+1]-yd[j])/float64(ym[j+1]-ym[j]))
+			op.GeoM.Translate(x*renderScale+xd[i], y*renderScale+yd[j])
+			dst.DrawImage(part, op)
+		}
 	}
 }
+
+// This affine presentation transform keeps every simulated boat in the water.
+// It is applied equally to all visible gameplay objects and the light cone;
+// gameplay geometry and deterministic collision decisions remain unchanged.
+func sceneY(y float64) float64 { return 124 + y*.79 }
+
+func (a *app) drawLantern(dst *ebiten.Image, x, y, scale float64, lit bool) {
+	img := a.images["lantern.png"]
+	if img == nil {
+		return
+	}
+	w, h := img.Bounds().Dx(), img.Bounds().Dy()
+	op := &ebiten.DrawImageOptions{Filter: ebiten.FilterLinear}
+	op.GeoM.Translate(-float64(w)/2, -float64(h)/2)
+	op.GeoM.Scale(scale, scale)
+	op.GeoM.Translate(x*renderScale, y*renderScale)
+	if !lit {
+		op.ColorScale.Scale(.32, .41, .52, .74)
+	}
+	dst.DrawImage(img, op)
+	if lit {
+		a.imageAt(dst, a.images["glow.png"], x, y, scale*.48)
+	}
+}
+
+func (a *app) lamp(dst *ebiten.Image) {
+	x, y := game.LampX, sceneY(game.LampY)
+	// The authored lighthead is large enough to read against a detailed sea.
+	a.imageAt(dst, a.images["glow.png"], x, y-8, 1.8)
+	a.imageAt(dst, a.images["lighthouse.png"], x, y-18, .78)
+}
+
+func (a *app) spotlight(dst *ebiten.Image, angle, halfWidth float64) {
+	img := a.images["beam.png"]
+	if img == nil {
+		return
+	}
+	bw, bh := img.Bounds().Dx(), img.Bounds().Dy()
+	op := &ebiten.DrawImageOptions{Filter: ebiten.FilterLinear}
+	// Authored cone points upwards and its narrow end is the lamp position.
+	op.GeoM.Translate(-float64(bw)/2, -float64(bh))
+	op.GeoM.Scale(1.18*halfWidth/(12*math.Pi/180), 1.17)
+	op.GeoM.Rotate(angle)
+	// Same transform as dynamic boat positions: visual and logical aim agree.
+	op.GeoM.Scale(1, .79)
+	op.GeoM.Translate(game.LampX*renderScale, sceneY(game.LampY)*renderScale)
+	dst.DrawImage(img, op)
+}
+
+func (a *app) drawSea(dst *ebiten.Image) {
+	dst.DrawImage(a.images["seascape.jpg"], nil)
+	shimmer := a.images["shimmer.png"]
+	if shimmer == nil {
+		return
+	}
+	secs := float64(time.Now().UnixNano()) / 1e9
+	// Sparse drifting painted water glints, not thousands of runtime arcs.
+	for row := 0; row < 4; row++ {
+		for col := 0; col < 4; col++ {
+			x := float64(col*520) - 60 + math.Sin(secs*.19+float64(row)*1.8)*12
+			y := 350 + float64(row*245) + math.Sin(secs*.24+float64(col))*4
+			op := &ebiten.DrawImageOptions{Filter: ebiten.FilterLinear}
+			op.GeoM.Translate(x, y)
+			op.ColorScale.ScaleAlpha(.26)
+			dst.DrawImage(shimmer, op)
+		}
+	}
+}
+
 func (a *app) drawFrame(dst *ebiten.Image) {
 	switch a.game.Screen {
 	case game.Title:
@@ -149,8 +206,8 @@ func (a *app) drawPredict(dst *ebiten.Image) {
 		if lit {
 			col = amber
 		}
-		vector.DrawFilledCircle(dst, float32(x*2), float32(380*2), float32(24*2), col, true)
-		vector.StrokeCircle(dst, float32(x*2), float32(380*2), float32(26*2), 3, ivory, true)
+		_ = col
+		a.drawLantern(dst, x, 380, .94, lit)
 	}
 	a.subText(dst, fmt.Sprintf("%d of 5", a.game.Night.Prediction), 480, 441)
 	a.smallText(dst, "← / → choose    •    SPACE begin", 480, 512)
@@ -160,20 +217,19 @@ func (a *app) drawNight(dst *ebiten.Image) {
 	g := a.game
 	n := &g.Night
 	dt := a.subTick()
+	seconds := float64(time.Now().UnixNano()) / 1e9
 	angle := g.Beam.Angle
 	boat := n.Boat
 	if !n.CheckIn && n.PauseTicks == 0 {
 		angle = math.Max(-game.MaxBeamAngle, math.Min(game.MaxBeamAngle, angle+g.Beam.Omega*dt))
-		boat.Advance((1 - 0.65*n.Fog) * boat.Length / 5400 * dt)
+		boat.Advance((1 - .65*n.Fog) * boat.Length / 5400 * dt)
 	}
 	a.spotlight(dst, angle, g.Beam.HalfWidth)
 	for i, s := range n.Sightings {
-		op := &ebiten.DrawImageOptions{Filter: ebiten.FilterLinear}
 		im := a.sightseeing[s.Kind]
-		wobble := math.Sin(float64(time.Now().UnixNano())/1e9*0.96+float64(i)) * 3
-		op.GeoM.Translate(-75, -165)
-		op.GeoM.Scale(0.78, 0.78)
-		op.GeoM.Translate(s.Pos.X*2, s.Pos.Y*2+wobble)
+		if im == nil {
+			continue
+		}
 		opacity := float32(1)
 		if s.State == game.Appearing {
 			opacity = float32(math.Min(1, float64(s.Age)/24))
@@ -181,37 +237,39 @@ func (a *app) drawNight(dst *ebiten.Image) {
 		if s.State == game.Leaving || s.State == game.Chased {
 			opacity = float32(math.Max(0, 1-float64(s.Age)/30))
 		}
-		if s.State == game.Noticed {
-			opacity = float32(.80 + .2*math.Sin(float64(time.Now().UnixNano())/1e9*7.2))
-		}
+		wobble := math.Sin(seconds*1.05+float64(i)*1.9) * 2.8
+		op := &ebiten.DrawImageOptions{Filter: ebiten.FilterLinear}
+		w, h := im.Bounds().Dx(), im.Bounds().Dy()
+		op.GeoM.Translate(-float64(w)/2, -float64(h)/2)
+		op.GeoM.Scale(.94, .94)
+		op.GeoM.Translate(s.Pos.X*renderScale, (sceneY(s.Pos.Y)+wobble)*renderScale)
 		op.ColorScale.ScaleAlpha(opacity)
 		dst.DrawImage(im, op)
 		if s.State == game.Noticed {
-			vector.StrokeCircle(dst, float32(s.Pos.X*2), float32(s.Pos.Y*2), float32(38+math.Sin(float64(time.Now().UnixNano())/1e9*6)*6), 2, amber, true)
+			a.imageAt(dst, a.images["glow.png"], s.Pos.X, sceneY(s.Pos.Y), .67)
 		}
 	}
 	p := boat.Position()
-	if n.Fog > 0.01 {
-		op := &ebiten.DrawImageOptions{Filter: ebiten.FilterLinear}
+	px, py := p.X, sceneY(p.Y)
+	if n.Fog > .01 {
 		im := a.images["fog.png"]
-		op.GeoM.Translate(-180, -115)
-		op.GeoM.Scale(.9+n.Fog*.5, .7+n.Fog*.45)
-		op.GeoM.Translate(p.X*2, p.Y*2)
+		op := &ebiten.DrawImageOptions{Filter: ebiten.FilterLinear}
+		w, h := im.Bounds().Dx(), im.Bounds().Dy()
+		op.GeoM.Translate(-float64(w)/2, -float64(h)/2)
+		op.GeoM.Scale(.67+n.Fog*.35, .66+n.Fog*.30)
+		op.GeoM.Translate(px*renderScale, py*renderScale)
 		op.ColorScale.ScaleAlpha(float32(n.Fog * .85))
 		dst.DrawImage(im, op)
 	}
-	a.imageAt(dst, a.images["boat.png"], p.X, p.Y, 0.73)
 	if boat.Lit {
-		vector.DrawFilledCircle(dst, float32(p.X*2+15), float32(p.Y*2-16), float32(6+math.Sin(float64(time.Now().UnixNano())/1e9*7.2)*2), amber, true)
+		a.imageAt(dst, a.images["glow.png"], px, py, .76)
 	}
+	a.drawBoat(dst, px, py+math.Sin(seconds*2.5)*1.3, math.Sin(seconds*1.3)*.035)
 	a.lamp(dst)
-	// Progress is conveyed by five accumulating amber harbour lanterns.
 	for i := 0; i < 5; i++ {
-		c := color.RGBA{101, 130, 155, 210}
-		if n.TotalTicks[i] > 0 && float64(n.LitTicks[i])/float64(n.TotalTicks[i]) >= .7 && (i < n.Crossing || n.Crossing == 4 && boat.T == 1) {
-			c = amber
-		}
-		vector.DrawFilledCircle(dst, float32((730+30*i)*2), float32(596*2), 12, c, true)
+		lit := n.TotalTicks[i] > 0 && float64(n.LitTicks[i])/float64(n.TotalTicks[i]) >= .7 &&
+			(i < n.Crossing || n.Crossing == 4 && boat.T == 1)
+		a.drawLantern(dst, 740+float64(i)*38, 598, .40, lit)
 	}
 	a.panel(dst, 26, 18, 908, 53)
 	a.drawText(dst, fmt.Sprintf("Crossing %d of 5", n.Crossing+1), 165, 54, a.small, ivory, true)
@@ -233,11 +291,27 @@ func (a *app) drawNight(dst *ebiten.Image) {
 		a.smallText(dst, "Y  yes     •     N  no", 480, 424)
 	}
 	for _, p := range a.particles {
-		op := float64(p.life-p.age) / float64(p.life)
-		col := color.RGBA{255, 218, 142, uint8(220 * op)}
-		vector.DrawFilledCircle(dst, float32(p.x*2), float32(p.y*2), float32(3+int(p.hue)), col, true)
+		alpha := float64(p.life-p.age) / float64(p.life)
+		col := color.RGBA{255, 218, 142, uint8(220 * alpha)}
+		vector.DrawFilledCircle(dst, float32(p.x*renderScale), float32(sceneY(p.y)*renderScale),
+			float32(3+int(p.hue)), col, true)
 	}
 }
+
+func (a *app) drawBoat(dst *ebiten.Image, x, y, rock float64) {
+	im := a.images["boat.png"]
+	if im == nil {
+		return
+	}
+	w, h := im.Bounds().Dx(), im.Bounds().Dy()
+	op := &ebiten.DrawImageOptions{Filter: ebiten.FilterLinear}
+	op.GeoM.Translate(-float64(w)/2, -float64(h)/2)
+	op.GeoM.Scale(.80, .80)
+	op.GeoM.Rotate(rock)
+	op.GeoM.Translate(x*renderScale, y*renderScale)
+	dst.DrawImage(im, op)
+}
+
 func (a *app) drawHarbour(dst *ebiten.Image) {
 	n := a.game.Night
 	a.panel(dst, 128, 110, 704, 495)
@@ -249,7 +323,8 @@ func (a *app) drawHarbour(dst *ebiten.Image) {
 		if n.TotalTicks[i] > 0 && float64(n.LitTicks[i])/float64(n.TotalTicks[i]) >= .7 {
 			c = amber
 		}
-		vector.DrawFilledCircle(dst, float32(x*2), float32(326*2), 40, c, true)
+		_ = c
+		a.drawLantern(dst, x, 326, 1.00, n.TotalTicks[i] > 0 && float64(n.LitTicks[i])/float64(n.TotalTicks[i]) >= .7)
 	}
 	a.subText(dst, fmt.Sprintf("Your guess: %d    •    Lanterns: %d", n.Prediction, n.Result), 480, 411)
 	a.smallText(dst, fmt.Sprintf("Noticed: %d    Came back: %d    Check-ins: %d", n.Noticed, n.CameBacks, len(n.Answers)), 480, 463)
@@ -267,7 +342,7 @@ func (a *app) drawBook(dst *ebiten.Image) {
 	a.drawText(dst, game.KindNames[idx], 480, 228, a.font, ink, true)
 	im := a.sightseeing[idx]
 	op := &ebiten.DrawImageOptions{Filter: ebiten.FilterLinear}
-	op.GeoM.Translate(-75, -170)
+	op.GeoM.Translate(-120, -120)
 	op.GeoM.Scale(1.85, 1.85)
 	op.GeoM.Translate(480*2, 310*2)
 	dst.DrawImage(im, op)

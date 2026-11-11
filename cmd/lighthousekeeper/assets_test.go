@@ -9,7 +9,7 @@ import (
 )
 
 func TestRequiredArtDecodes(t *testing.T) {
-	required := []string{"title_art.jpg", "seascape.jpg", "beam.png", "boat.png", "fog.png", "lighthouse.png", "sightings.png", "parchment.png"}
+	required := []string{"title_art.jpg", "seascape.jpg", "beam.png", "boat.png", "fog.png", "lighthouse.png", "sightings.png", "parchment.png", "shimmer.png", "ui_rail.png", "glow.png", "lantern.png"}
 	for _, name := range required {
 		data, err := assetFS.ReadFile("assets/" + name)
 		if err != nil {
@@ -24,6 +24,44 @@ func TestRequiredArtDecodes(t *testing.T) {
 		}
 	}
 }
+func TestPainterlyAtlasDimensions(t *testing.T) {
+	for _, item := range []struct {
+		name string
+		w, h int
+	}{
+		{"seascape.jpg", 1920, 1440},
+		{"title_art.jpg", 1920, 1440},
+		{"sightings.png", 1440, 240},
+		{"ui_rail.png", 960, 220},
+	} {
+		data, err := assetFS.ReadFile("assets/" + item.name)
+		if err != nil {
+			t.Fatal(err)
+		}
+		cfg, _, err := image.DecodeConfig(bytes.NewReader(data))
+		if err != nil {
+			t.Fatal(item.name, err)
+		}
+		if cfg.Width != item.w || cfg.Height != item.h {
+			t.Fatalf("%s: got %dx%d, want %dx%d", item.name, cfg.Width, cfg.Height, item.w, item.h)
+		}
+	}
+}
+
+func TestPresentationMappingPreservesOrder(t *testing.T) {
+	last := sceneY(-1)
+	for y := 0.; y <= 720; y += 10 {
+		got := sceneY(y)
+		if got <= last {
+			t.Fatalf("visual coordinate mapping not monotonic: %g", y)
+		}
+		last = got
+	}
+	if sceneY(40) < 130 || sceneY(640) > 650 {
+		t.Fatal("artwork projection outside scene bounds")
+	}
+}
+
 func TestSoundCuesProducePCM(t *testing.T) {
 	for name, s := range cues {
 		b := procedural(s)

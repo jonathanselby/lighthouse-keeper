@@ -29,6 +29,7 @@ type app struct {
 	game                 *game.Game
 	images               map[string]*ebiten.Image
 	sightseeing          [6]*ebiten.Image
+	rail                 [9]*ebiten.Image
 	heading, font, small font.Face
 	audio                *soundBank
 	savePath             string
@@ -60,7 +61,7 @@ func main() {
 		log.Printf("journal recovery: %v", loadErr)
 		a.saveMessage = game.UIText[25]
 	}
-	for _, name := range []string{"seascape.jpg", "title_art.jpg", "lighthouse.png", "boat.png", "sightings.png", "parchment.png", "beam.png", "fog.png"} {
+	for _, name := range []string{"seascape.jpg", "title_art.jpg", "lighthouse.png", "boat.png", "sightings.png", "parchment.png", "beam.png", "fog.png", "shimmer.png", "ui_rail.png", "glow.png", "lantern.png"} {
 		data, e := assetFS.ReadFile("assets/" + name)
 		if e != nil {
 			log.Fatalf("required art %s: %v", name, e)
@@ -72,7 +73,16 @@ func main() {
 		a.images[name] = ebiten.NewImageFromImage(im)
 	}
 	for i := 0; i < 6; i++ {
-		a.sightseeing[i] = a.images["sightings.png"].SubImage(image.Rect(150*i, 0, 150*(i+1), 360)).(*ebiten.Image)
+		a.sightseeing[i] = a.images["sightings.png"].SubImage(image.Rect(240*i, 0, 240*(i+1), 240)).(*ebiten.Image)
+	}
+	// Prepare brass-panel nine-slice regions once, not on every draw.
+	rail := a.images["ui_rail.png"]
+	rw, rh := rail.Bounds().Dx(), rail.Bounds().Dy()
+	xp, yp := [4]int{0, 52, rw - 52, rw}, [4]int{0, 32, rh - 32, rh}
+	for j := 0; j < 3; j++ {
+		for i := 0; i < 3; i++ {
+			a.rail[j*3+i] = rail.SubImage(image.Rect(xp[i], yp[j], xp[i+1], yp[j+1])).(*ebiten.Image)
+		}
 	}
 	a.heading = loadFont(gobold.TTF, 56)
 	a.font = loadFont(goregular.TTF, 36)

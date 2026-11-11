@@ -75,3 +75,9 @@ This is the initial implementation candidate, not a certified polished release. 
 ## Licence
 
 MIT. See [`LICENSE`](LICENSE).
+
+## Painterly visual implementation
+
+The game uses original 4:3 painterly illustration composites and separately animated boat, lighthouse, sightings, beam and fog. Rendering remains a thin Ebitengine adapter over the unchanged deterministic core. New artwork is made offline via `assets-source/export_premium.py`; see [`ARTWORK.md`](ARTWORK.md) for source provenance, asset inventory and quality gates.
+
+The rendered world is not the game state. A simple presentation-only vertical transform keeps travelling boats over the sea, while the authoritative beam test, timing, rewards, Sightings Book and Harbour Log use exactly the same rules as before. Brass/navy interface panels share one nine-slice image; there is no additional runtime UI or graphics framework.

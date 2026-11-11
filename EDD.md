@@ -372,6 +372,16 @@ The five November 2026 sample images are **approved ambition and mood references
 
 The stage remains **4:3 with a fixed 960 × 720 logical coordinate system**. Place the painterly lighthouse lantern exactly over the core lamp `(480,640)`, keep the sea and boat path clear, and put detailed architecture/flowers on the margins. A composition originally painted at 16:9 must be recomposed for 4:3, not squashed or centre-cropped until controls are obscured. Boat, beam, six sightings, five lanterns and check-in question have priority over decorative detail.
 
+### Implementation clarification — painterly corrective pass
+
+The initial vector-like graphical pass was rejected after actual capture. The corrective implementation replaces it with three original source paintings composed **offline** by `assets-source/export_premium.py` into the sea, lantern, boat, six sighting sprites and reused UI/light assets. This preserves the runtime's sole rendering dependency, Ebitengine; Python, Pillow and NumPy are **authoring-only** tools. The final result is still subject to owner/hardware acceptance.
+
+The authoritative scene remains 960 × 720. To display all boat positions against a predominantly painted ocean, the renderer applies the presentation-only map `visualY = 124 + 0.79 × logicalY`. Beam texture coordinates receive the identical affine projection *after* rotation, as do sightings, fog and particles. In particular, the lighthouse's visible lighthead is centred at `visualY(LampY)` instead of assuming a source crop centre is the gameplay beam origin. This changes no rule, crossing, bearing, reward or replay value.
+
+The twelve runtime art files are listed in `ARTWORK.md`. The six sightseeing paintings are atlas regions of 240 × 240 pixels. A single UI rail is sliced at **loading**, not per frame, and reused as nine image draws per panel. The initial water-curl renderer is deleted; sixteen faint translated shimmer draws are bounded visual work and can be omitted on slower hardware. The boat rocking is a bounded render-only angle, not a physics update. No Kage shader or new runtime framework is introduced.
+
+This is an implementation-level clarification of §20's requirement for painterly animation and no added gameplay latency. The remaining mandatory evidence is CI success on the changed build, graphical screenshots and real 60/120 Hz frame measurements. A static preview does not close those gates.
+
 ### 20.2 Layer and asset plan
 
 | Visual layer | Shipped form | Runtime mechanism |

@@ -33,3 +33,17 @@ Astro Answers used AppImage successfully. Dandelion Drift's target Ubuntu hardwa
 The first runtime art pass is a **candidate**, not an assertion that the premium benchmark has been reached. Real graphical launch, measured frame times at 60 and 120 Hz, child/UAT, actual sound device behaviour, and independent code-derived design evidence remain mandatory. The implementation must be corrected from evidence rather than claiming success from unit tests alone.
 
 > **Does every piece of machinery remove more complexity than it introduces?**
+
+## Corrective painterly pass — visual quality is a product requirement
+
+The first CI-green candidate proved the underlying mechanics but not the approved graphical standard. Its sea used thousands of mathematically drawn arc strokes, its lighthouse was incorrectly cropped at the bottom of the screen, and flat animal silhouettes did not belong to the title painting. A graphical launch check could not catch this artistic mismatch.
+
+The corrective design keeps `internal/game` byte-for-byte unchanged. Original approved painterly studies are composited and isolated offline into a true moving boat, six independent sightings, a foreground lantern, warm gradient beam, fog and one detailed 4:3 sea. The lantern is now visibly aligned with the light origin, and the actual moving gameplay components are never baked into the background.
+
+A monotonic `sceneY` transform repositions the visual boat within the painted sea and is applied to the beam, fog, sightings and particles. Logical angles, distances, rewards and persistence remain those of the headless game. Visual-only rocking, painted shimmer and soft lighting use frame time; they never consume gameplay randomness.
+
+The UI shares a single brass/navy frame, sliced once at startup and drawn with nine transforms for crisp corners. It replaces thick debug-style boxes without introducing a GUI framework. The Book still uses a single reusable parchment illustration, and all six paintings share one atlas.
+
+We deliberately rejected a real-time fluid renderer, generic shader/post-processing stack, scene graph, and frame-buffer-based lighting. None removes more complexity than it adds for this bounded single-scene game. The art-source pipeline is offline and not part of the shipped application.
+
+This is **not** a declaration of premium approval. The source painting, preview and compiled interactive render are different kinds of evidence. The CI, visual UAT and refresh-rate tests remain distinct gates.

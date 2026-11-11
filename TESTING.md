@@ -13,23 +13,14 @@ PASS
 
 Headless tests run without a renderer, native window or hardware audio. They exercise complete crossing and deterministic replay, speed difference under illumination, beam geometry, fog, sighting notice/chase, chime/window rearm, lantern thresholds, scheduled check-ins, rest and extra-night rules, desk timing and persistence safety. These tests do not prove that the Ebitengine application compiles on Go 1.25, nor that a Linux desktop can actually launch it.
 
-## GitHub engineering and launch gates observed — 11 November 2026
+## Integration and hardening gates — outstanding until verified
 
-- **CI success:** [run 42962738531](https://github.com/jonathanselby/lighthouse-keeper/actions/runs/42962738531), source commit `46e44f0a884e74305b5ad578c4ff2398e4e7beb6`: module contract, gofmt, vet, race-enabled tests, Linux/amd64 and Linux/ARM64 builds, and named core acceptance all passed.
-- **CI reconfirmation:** [run 42962933707](https://github.com/jonathanselby/lighthouse-keeper/actions/runs/42962933707), source/workflow commit `193a10ee255e43d44c6ad50857f2fd8750779784`, passed.
-- **Production release candidate:** [run 42962933696](https://github.com/jonathanselby/lighthouse-keeper/actions/runs/42962933696), source/workflow commit `193a10ee255e43d44c6ad50857f2fd8750779784`, passed full validation, native amd64 build, Xvfb GUI smoke launch, permission-preserving tar archive verification and Actions artifact upload.
-- **Binary asset integrity:** all eight embedded art assets and the approved source PNG in GitHub were compared byte-for-byte using Git blob SHA against the local approved files.
-- **Initial failed CI:** first module run failed because go.mod indentation was noncanonical; next run passed module/format but failed before compilation because the binary assets were missing. After asset upload the first complete graphical compile found a `float64 + int` error in the water line expression; corrected to `float64(i)`. No gameplay mechanic changed.
-- **Actual GUI gameplay and UAT:** NOT observed by this automated gate. Six seconds of successful Xvfb startup is not a completed gameplay or visual test.
-
-## Integration and hardening gates — checklist with evidence
-
-- [x] Go 1.25+/Ebitengine 2.10.6 module resolution and `go mod tidy` contract (green GitHub CI).
-- [x] Full `go vet ./...` (green GitHub CI).
-- [x] Full `go test -race -count=1 ./...` (green GitHub CI).
-- [x] Linux/amd64 and Linux/arm64 CI production builds.
-- [x] Embedded asset decode and procedural audio tests under the Go 1.25 CI toolchain.
-- [x] Production executable Xvfb graphical-launch smoke test (run 42962933696).
+- [ ] Go 1.25+/Ebitengine 2.10.6 module resolution and `go mod tidy` contract.
+- [ ] Full `go vet ./...`.
+- [ ] Full `go test -race -count=1 ./...`.
+- [ ] Linux/amd64 and Linux/arm64 production builds.
+- [ ] Embedded asset decode and procedural audio tests under the build toolchain.
+- [ ] Production executable Xvfb graphical-launch smoke test.
 - [ ] Full-screen gameplay, visual transitions, Book, Harbour Log, Rest, Desk mode and save recovery manually observed.
 - [ ] Actual 60 Hz hardware frame-time evidence and input responsiveness.
 - [ ] Actual 120 Hz hardware frame-time evidence on a verified 120 Hz display.
@@ -38,18 +29,6 @@ Headless tests run without a renderer, native window or hardware audio. They exe
 - [ ] One real 15/25-minute homework session with Keeper's Bell.
 - [ ] Constrained-hardware Garage benchmark (CPU, RAM, GPU memory, frame rate, executable size, scene entity caps).
 - [ ] Original layered artwork approved against five cinematic quality references.
-
-## Graphical visual inspection — Linux Xvfb, 2026-11-11
-
-The production Linux x86-64 executable from release-candidate workflow 42962933696 was unpacked, executed in a 1920×1080 virtual display using software OpenGL, and photographed at Title and at two points during Crossing 1. It stayed running and showed a functioning screen transition from Title → Predict → Night via keyboard input.
-
-**Observed success:** the title painting displays at correct 4:3 aspect ratio with black pillarboxing; keyboard input advances screens; the night scene draws the beam, sea, lamp, crossing HUD, moving boat and sightings.
-
-**Observed visual-quality failure:** the current night scene is substantially flatter and more schematic than the five approved premium painterly references, especially the water, illustrated sightings, lighthouse and boat sprites. The title menu is functional but uses generic rectangular panels. These visuals are implementation placeholders and do **not** satisfy the locked premium graphics acceptance criterion.
-
-**Additional usability risk:** the first part of a crossing may position the boat near the HUD/sky region, where readability is compromised. The photographic snapshots are not sufficient to certify all seeded paths or whether noticing and return prompts remain readable at every boat position.
-
-**Next gate:** replace or materially improve the active scene's hero art and layout while preserving the core engine, then repeat captured-screen inspection and hardware frame pacing measurements. No high-refresh performance claim is made from these software-rendered screenshots.
 
 ## Test evidence required at release
 
@@ -63,3 +42,19 @@ Name the hardware, display refresh/resolution, OS, actual measured FPS/TPS and f
 - Local audio access may vary across Linux desktops; silent mode must remain playable.
 - Large 1920×1440 render target must sustain chosen refresh rates on real GPU hardware.
 - Asset visual quality must meet human premium-art approval; no automated test can certify taste.
+
+## Corrective painterly build — visual implementation review
+
+**Baseline evidence:** prior implementation was CI-green at GitHub Actions run `42962933707` and the production release candidate launched under a virtual Linux display in run `42962933696`. Its actual running night screenshot failed the owner's premium-art standard, despite passing the technical build gates. That is the reason for this focused renderer-only replacement.
+
+**Local work completed for the corrective candidate:**
+
+- Kept the entire `internal/game` implementation unchanged; the headless Go game package still passes.
+- Replaced generated water arcs with a composited original painterly sea and bounded moving water-light texture.
+- Moved the visible boat and light cone into the same monotonic painterly scene projection without affecting logical hit tests.
+- Replaced the primitive boat, lighthouse and sightings assets with masked original illustrations.
+- Replaced plain geometric panels with one nine-slice brass/navy panel, pre-sliced at startup.
+- Added separate lanterns, glow, fog, and art atlas dimension/decoding tests.
+- Generated an offline composite review still: `lighthouse-premium-night-preview.jpg` (this is **not** a captured game frame).
+
+**Gates still open on the changed source:** Go 1.25/Ebitengine CI, graphical launch of the revised binary, actual live motion and high-DPI screenshots, native 60/120 Hz frame-time and responsiveness measurements, child UAT, homework UAT and final owner approval of artistic quality. The previous successful CI and release build must not be represented as covering new unmerged source.
