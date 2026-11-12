@@ -21,7 +21,6 @@ func Fragment(dstPos vec4, srcPos vec2, color vec4) vec4 {
     factor := (0.32+depth*1.28)*inside
     offset := vec2((6.4*a+4.2*b+2.6*c)*factor, (2.2*a+3.0*b)*factor)
     source := clamp(srcPos+offset, vec2(2.0), vec2(1917.0, 1437.0))
-    sourceWater := imageSrc1AtFromSrc0Pos(source).r
     moving := imageSrc0At(source)
-    return mix(fixed,moving,inside*sourceWater)
+    return mix(fixed,moving,inside)
 }
