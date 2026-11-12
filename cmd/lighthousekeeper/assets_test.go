@@ -2,6 +2,8 @@ package main
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"fmt"
 	"image"
 	_ "image/jpeg"
 	_ "image/png"
@@ -77,5 +79,19 @@ func TestViewportPreservesAspect(t *testing.T) {
 		if w*3 != h*4 {
 			t.Fatalf("invalid 4:3 internal layout at %v", wh)
 		}
+	}
+}
+
+func TestSeascapeIsApprovedSinglePainting(t *testing.T) {
+	data, err := assetFS.ReadFile("assets/seascape.jpg")
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Prevent an old stitched seascape from silently passing CI merely
+	// because it decodes and has the correct pixel dimensions.
+	const expected = "d1ac25cc66411dd87627b26b32b00aa90c527cfa15ab429179220f742818de6a"
+	got := fmt.Sprintf("%x", sha256.Sum256(data))
+	if got != expected {
+		t.Fatalf("seascape source mismatch: %s (expected approved master %s)", got, expected)
 	}
 }
