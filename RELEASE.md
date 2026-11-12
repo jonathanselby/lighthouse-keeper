@@ -80,3 +80,13 @@ Unobserved hardware, visual and child tests remain unchecked. The repository may
 - [ ] Human child and Keeper's Bell homework acceptance.
 
 **The public release tag remains withheld until outstanding gates are evidenced.**
+
+## v0.3 integrated UAT candidate — 13 November 2026
+
+- [x] Implement layered moving sea, fixed foreground rocks, independent spray, no baked static beam, faster progressive crossings and retuned beam tolerance.
+- [x] CI with race tests and cross-compilation: [43327777321](https://github.com/jonathanselby/lighthouse-keeper/actions/runs/43327777321).
+- [x] Reproducible artwork bake and committed binaries: [43327777298](https://github.com/jonathanselby/lighthouse-keeper/actions/runs/43327777298).
+- [x] Native Linux executable and Xvfb launch: [43327777251](https://github.com/jonathanselby/lighthouse-keeper/actions/runs/43327777251).
+- [ ] Full-scene real-time visual inspection of all rock/spray areas and dynamic beam alignment.
+- [ ] 60/120 Hz native hardware pacing, gameplay feel, child and homework UAT.
+- [ ] Final release approval. **This is a candidate, not a signed-off release.**
