@@ -1,6 +1,6 @@
 # Lighthouse Keeper — Product Requirements Document
 
-**Version:** 0.2
+**Version:** 0.3
 **Status:** Locked product contract for V0.1.0; build and human/hardware acceptance pending
 **Product name:** Lighthouse Keeper
 
@@ -15,7 +15,7 @@
 
 > **Noticing is fine. Coming back is the skill.**
 
-**Visual ambition, v0.2.** Present this small game with the finish of a leading contemporary premium iPad, iPhone, Steam or Switch indie title: original painterly art, rich but restrained light, fluid motion, readable interactions and carefully timed transitions. The five visual concepts reviewed in November 2026 are *quality and mood references*, not five selectable themes or ready-to-use runtime sprites. The scene must be rebuilt as layered, independently animatable artwork; the movable beam and moving boat cannot be baked into one static image.
+**Visual ambition, v0.3.** Present this small game with the finish of a leading contemporary premium iPad, iPhone, Steam or Switch indie title: original painterly art, rich but restrained light, fluid motion, readable interactions and carefully timed transitions. The five visual concepts reviewed in November 2026 are *quality and mood references*, not five selectable themes or ready-to-use runtime sprites. The scene must be rebuilt as layered, independently animatable artwork; the movable beam and moving boat cannot be baked into one static image.
 
 ## Product objective
 
@@ -100,7 +100,7 @@ predict the night -> keep the beam on the boat
 - gamepad and touch input in V0.1;
 - Windows, macOS and mobile packaging in V0.1.
 
-## V0.2 direction
+## V0.3 direction
 
 No mobile, Switch, Windows or macOS implementation is committed in V0.1. The high-end mobile and console games are benchmarks for visual and motion quality, not additional platforms or runtime abstraction requirements.
 
@@ -108,7 +108,7 @@ No mobile, Switch, Windows or macOS implementation is committed in V0.1. The hig
 
 ### FR1 — The crossing
 
-A boat crosses from the open sea to the harbour along a gently curving course lasting about 90 seconds. A night is five crossings.
+A boat crosses from the open sea to the harbour along a gently curving course. The first fully illuminated crossing targets roughly 55 seconds, then crossings gradually shorten and courses become more involved within and across nights. A night remains five crossings. Unlit boats slow but always arrive.
 
 The boat always arrives. Keeping it lit makes the crossing faster and the harbour brighter; losing it never fails the crossing.
 
@@ -147,7 +147,7 @@ Any answer earns a check-in star. The game never contradicts her answer.
 
 ### FR8 — Progression
 
-Across nights the boat's course curves more, sightings come a little more often and the beam narrows slightly, to fixed caps. Progression never removes anything she has earned.
+Across nights the boat's course curves more, crossings become brisker, sightings come a little more often and the beam narrows slightly, to fixed caps. Progression never removes anything she has earned.
 
 ### FR9 — Rest
 
@@ -196,6 +196,16 @@ The gameplay coordinate space remains fixed at **960 × 720 (4:3)**. Default pre
 
 All progress and check-in answers are stored locally only; no telemetry, network, accounts or clinical profiles. An absent save starts a new game. A malformed, oversized or incompatible save is rejected safely, with a retained recovery copy and a child-appropriate explanation; the game remains playable. Writes are atomic. The parent override allows at most one extra night per local calendar day and persists across relaunches.
 
+### FR17 — Living ocean, fixed stones and only one lighthouse beam (UAT November 2026)
+
+The premium painterly sea must feel alive in motion, not just in screenshots. Water swells and reflections move continuously; crest foam and every conspicuous rock-impact spray burst changes shape or position. Rock faces, cliffs, harbour and masonry do not deform. Rock, water and spray are independently authored layers with explicit draw order, not colour-based image segmentation at runtime.
+
+The original broad golden spotlight must be removed from the static painting. The gameplay-controlled spotlight is the sole moving lighthouse beam and its visual position must match the authoritative beam/boat interaction. Maintain the original detailed illustration and reduce the renderer's complexity wherever possible.
+
+### FR18 — Meaningful, gentle tracking challenge (UAT November 2026)
+
+Boats must visibly progress across the bay, with meaningfully changing bearings that require active beam adjustment. Start around 55 seconds per well-lit crossing; gradually increase course curvature and speed and narrow the beam within bounded, child-appropriate limits. Five crossings, two-to-three check-in bells, no-failure policy, all sightings and the full original PRD remain unchanged.
+
 ## Acceptance criteria
 
 V0.1 is accepted when automated and playable evidence shows that:
@@ -221,6 +231,13 @@ V0.1 is accepted when automated and playable evidence shows that:
 19. 4:3 letterboxing, high-density rendering, clear boat/sighting readability, correct moving beam and UI legibility pass on different monitor aspect ratios and scale factors;
 20. graphics and sound are original or have documented redistribution rights; compressed asset and decoded memory budgets are measured; reducing decorative quality never changes rules or rewards;
 21. oversized, malformed or incompatible saves are rejected within bounded work and memory, atomic writes preserve prior data on interruption, and the once-per-day parent extra night persists.
+
+### Additional v0.3 UAT acceptance criteria
+
+22. The ocean visibly undulates and reflects light over a 10–15-second recording; there are no static dominant spray plumes, obvious repeated tiling or moving shoreline seams.
+23. All foreground rock pixels remain unchanged with spray disabled; spray is independently animated in front of and behind the fixed rocks, including the specific left-hand rock formation rejected during UAT.
+24. No golden cone remains baked into the static gameplay background; exactly one authoritative, moving spotlight appears and tracks the simulated boat accurately.
+25. Crossing times, curvature and beam width demonstrably require more active player tracking than the initial UAT build, without missing check-in bells, loss of features, input latency or removal of the gentle no-failure rules.
 
 ## Definition of done
 

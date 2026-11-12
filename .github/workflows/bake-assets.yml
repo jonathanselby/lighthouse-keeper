@@ -1,0 +1,46 @@
+name: Bake Art Into Repository
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'assets-source/bake_living_ocean.py'
+      - '.github/workflows/bake-assets.yml'
+permissions:
+  contents: write
+concurrency:
+  group: lighthouse-art-bake
+  cancel-in-progress: false
+jobs:
+  art:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Reproduce original layered ocean and test it
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check numpy==2.2.6 pillow==11.3.0 opencv-python-headless==4.12.0.88
+          python assets-source/bake_living_ocean.py
+          python assets-source/test_living_ocean.py
+      - name: Publish baked binaries (no browser upload)
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add cmd/lighthousekeeper/assets/seascape.jpg \
+            cmd/lighthousekeeper/assets/water-domain.png \
+            cmd/lighthousekeeper/assets/shore-fixed.png \
+            cmd/lighthousekeeper/assets/rocks-fixed.png \
+            cmd/lighthousekeeper/assets/rocks-bottom.png \
+            cmd/lighthousekeeper/assets/impact-atlas.png
+          if git diff --cached --quiet; then
+            echo "Baked art already current"
+          else
+            git commit -m "Bake original painterly water, rock and spray layers"
+            git push origin HEAD:main
+          fi

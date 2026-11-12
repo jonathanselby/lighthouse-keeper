@@ -47,3 +47,11 @@ The UI shares a single brass/navy frame, sliced once at startup and drawn with n
 We deliberately rejected a real-time fluid renderer, generic shader/post-processing stack, scene graph, and frame-buffer-based lighting. None removes more complexity than it adds for this bounded single-scene game. The art-source pipeline is offline and not part of the shipped application.
 
 This is **not** a declaration of premium approval. The source painting, preview and compiled interactive render are different kinds of evidence. The CI, visual UAT and refresh-rate tests remain distinct gates.
+
+## v0.3 — UAT findings and rejected mechanisms
+
+User testing identified three failures: water and spray remained visibly frozen; a non-interactive beam had been painted into the seascape; the 90-second boat course hardly required adjusting the beam. The lab tried translucent shifting strips, spray masks and colour-derived rock exclusions. These were rejected because fixed spray remained underneath and the rock could deform when a displaced sample landed on it. The single-rock independent-layer proof passed visual UAT and is the baseline for the full sea.
+
+**Chosen:** reproducing classic arcade foreground priorities. A clean ocean source moves under one geometric shader; real stone cut-outs are drawn *after* water; separate original-art spray appears before and after the stone. One ten-pose atlas, five impact sockets, no sprite emitter, no extra framework. Original painterly composition retained. Back-end retune only adjusts bounded durations, Bezier curvature and beam tolerance, and reschedules bells so full PRD scope remains intact.
+
+**Rejected:** heuristic runtime masks, image-colour rock detection, CPU pixel drawing, full-frame animation/video, full fluid simulation, large animation atlases, frozen whitewater and a cosmetic second beam. Real GPU FPS and human visual quality still require acceptance on the intended laptop.

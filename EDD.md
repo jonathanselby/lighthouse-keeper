@@ -1,9 +1,9 @@
 # Lighthouse Keeper — Engineering Design Document
 
-**Version:** 0.2 (Garage simplification review + premium visual design)
+**Version:** 0.3 (Garage simplification review + premium visual design)
 **Status:** Locked engineering baseline for V0.1.0; initial implementation candidate, integration/performance/UAT evidence pending
 **Implementation:** Go 1.25+, Ebitengine 2.10.6 (pinned)
-**Product source:** Lighthouse Keeper PRD v0.2 (FR1–FR16, AC1–AC21)
+**Product source:** Lighthouse Keeper PRD v0.3 (FR1–FR16, AC1–AC21)
 **Review source:** https://github.com/jonathanselby/engineering-under-constraints — `METHODOLOGY.md`, `principles/modern-software.md`, `principles/constraint-review.md`, `c64/lessons.md`
 
 **Version choice:** 2.10.6 includes a fix for uneven update timing near the TPS or its multiples (Ebitengine's 7 November 2026 release). It is preferred to 2.10.5 specifically because frame pacing is a product requirement.
@@ -598,12 +598,18 @@ The beam is the attention, the boat is the task, the sightings are the world bei
 
 > **Does every piece of machinery remove more complexity than it introduces?**
 
-## 30. Historical renderer simplification — pending visual acceptance
+## 32. UAT remediation — living sea, fixed foreground and greater tracking (v0.3)
 
-The final scene is one coherent authored 1920 × 1440 JPEG from an original painterly source (not three stitched ocean paintings). A short offline script removes the source's decorative boat using same-horizon water; dynamic boat, spotlight, fog, sightings, lantern and HUD remain distinct. The old `shimmer.png` texture and sixteen glint drawings have been deleted. Motion instead uses **twelve prepared image subregions** drawn with bounded horizontal sine offsets and very low alpha over their original location. This directly reuses Ebitengine's existing `SubImage` and `DrawImage`; no shaders, 3D engine, physics or runtime asset pipeline. The painted scene is 479,359 bytes compared with the previous 695,231-byte stitched image (~31% reduction for that asset). The gameplay core is unchanged.
+**Root-cause design.** The earlier flattened painting encoded bright fixed spray and rocks in the same texture; colour-dependent runtime masks occasionally authorised spray motion on stone pixels. The remedy is structural and reproduces the independent playfield/sprite priority approach used by arcade systems, not another colour classifier.
 
-**Acceptance:** full CI, real executable screenshots and continuous gameplay inspection, 60 Hz / 120 Hz hardware frame pacing, child play and homework UAT remain separate gates. A successful artist-side preview is not release proof.
+**Offline authoring.** `assets-source/bake_living_ocean.py` derives all runtime sea assets reproducibly from the original project `approved-ocean-study.png`. It removes the baked static spotlight by an authored donor retouch, replaces the frozen plume and rock regions with clean water, and exports: `seascape.jpg`, `water-domain.png`, `shore-fixed.png`, `rocks-fixed.png`, `rocks-bottom.png` and ten frames in `impact-atlas.png`. Only art-bake CI needs Python/Pillow/NumPy/OpenCV; Go runtime does not.
 
-## 31. Presentation projection correction (candidate `2ace3b02`)
+**Runtime priority order:** one water-only Kage shader samples `seascape.jpg` with an authored *geometry* water-domain mask. Behind-rock spray goes next, then immutable original-art shoreline and two rock cut-outs, then five bounded independently animated spray instances. The authored spotlight, boat and sightings render separately under the normal game loop. No water shader samples moving rock source art and no game state is written by effects. No physics/fluid engines or CPU per-pixel loops.
 
-The one-piece seascape requires water-space coordinates. To prevent boats with low logical Y from appearing above the painted horizon, `sceneY(y)` now projects the authoritative logical Y to `235 + 0.60*y` for all moving visual objects. The beam source position and light-cone Y transform use the same slope (`0.60`). This is deliberately presentation-only: boat Bezier, `WithinBeam`, crossing outcome, fog and RNG are unchanged. A headless adapter test keeps the mapping monotonic and within water bounds. The downloaded GitHub-built candidate was captured after this change; the moving boat is now visually in water and the master painting has no horizontal seams. Hardware 60/120 Hz proof and whole-crossing light alignment are still required.
+**Render cost:** one bounded water pass, three fixed foreground DrawImage calls and at most ten spray-pose draws; one ten-frame 640×256 sprite atlas. The graphics image sizes are explicitly measured in the art test. The optional wake reuses the same atlas. A lower-resolution water-only pass could be considered if real 120 Hz hardware evidence justifies it; never reduce artist-approved quality merely to meet an arbitrary file size.
+
+**Projection:** stage logical 960×720, framebuffer 1920×1440. `sceneY(y)=338+0.42*y` places even upper-edge boat paths within the painted sea. The beam visual Y transform uses the same 0.42 multiplier; beam hit tests remain authoritative in `internal/game`.
+
+**Tracking retune:** the fully-lit target begins at 3,300 ticks (55 seconds), decreases by 150 ticks per crossing and 65 ticks per completed night up to night 10, capped at 1,950 ticks; unlit multiplier has lower bound 0.40. Beam half-width progresses from 9° to 6.5°. More curved Bezier controls still lie within the original angular limits. Guaranteed check-in slots now ring at 15–28 seconds, preserving two to three per night even with shorter crossings. The original five-crossing, no-failure, Book, Log, local save and Keeper's Bell contracts are unchanged.
+
+**Evidence:** automated headless Go regression and offline art/motion checks are mandatory; CI full Go 1.25, graphical shader compilation, Linux release build, actual night capture, human visual approval and native 60/120 Hz fluidity remain separate release gates. Never infer hardware frame pacing from Xvfb.

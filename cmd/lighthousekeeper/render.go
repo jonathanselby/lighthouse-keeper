@@ -79,9 +79,7 @@ func (a *app) panel(dst *ebiten.Image, x, y, w, h float64) {
 // This affine presentation transform keeps every simulated boat in the water.
 // It is applied equally to all visible gameplay objects and the light cone;
 // gameplay geometry and deterministic collision decisions remain unchanged.
-// Map logical water coordinates into the painting’s ocean, below the horizon.
-// Apply the same affine slope to the light cone; the simulation remains untouched.
-func sceneY(y float64) float64 { return 235 + y*.60 }
+func sceneY(y float64) float64 { return 338 + y*.42 }
 
 func (a *app) drawLantern(dst *ebiten.Image, x, y, scale float64, lit bool) {
 	img := a.images["lantern.png"]
@@ -121,31 +119,25 @@ func (a *app) spotlight(dst *ebiten.Image, angle, halfWidth float64) {
 	op.GeoM.Scale(1.18*halfWidth/(12*math.Pi/180), 1.17)
 	op.GeoM.Rotate(angle)
 	// Same transform as dynamic boat positions: visual and logical aim agree.
-	op.GeoM.Scale(1, .60)
+	op.GeoM.Scale(1, .42)
 	op.GeoM.Translate(game.LampX*renderScale, sceneY(game.LampY)*renderScale)
 	dst.DrawImage(img, op)
 }
 
 func (a *app) drawSea(dst *ebiten.Image) {
-	// A single original painterly scene, with zero joined horizons or scroll tiles.
-	dst.DrawImage(a.images["seascape.jpg"], nil)
-
-	// Historic raster-strip scrolling, implemented with the existing sprite draw.
-	// Twelve translucent strips move by just a few pixels; no fluid simulation,
-	// per-pixel CPU loop, custom shader, extra texture or gameplay state.
+	// CPS/Amiga priority planes: water samples CLEAN paint, then explicit
+	// spray is drawn behind and in front of separate, immutable stone art.
 	seconds := float64(time.Now().UnixNano()) / 1e9
-	for i, band := range a.water {
-		if band == nil {
-			continue
-		}
-		phase := seconds*.56 + float64(i)*.82
-		dx := math.Sin(phase)*3.0 + math.Sin(phase*.31)*1.4
-		op := &ebiten.DrawImageOptions{Filter: ebiten.FilterLinear}
-		op.GeoM.Translate(440+dx, float64(754+i*31))
-		op.ColorScale.ScaleAlpha(float32(.10 + .06*(1+math.Sin(phase*.73))*.5))
-		dst.DrawImage(band, op)
-	}
+	a.drawLivingWater(dst)
+	a.drawImpacts(dst, true, seconds)
+	dst.DrawImage(a.images["shore-fixed.png"], &ebiten.DrawImageOptions{GeoM: moved(0, 760)})
+	dst.DrawImage(a.images["rocks-fixed.png"], &ebiten.DrawImageOptions{GeoM: moved(314, 1040)})
+	dst.DrawImage(a.images["rocks-bottom.png"], &ebiten.DrawImageOptions{GeoM: moved(900, 1290)})
+	a.drawImpacts(dst, false, seconds)
 }
+
+// Translate already-authored transparent foreground layers without mutation.
+func moved(x, y float64) ebiten.GeoM { var m ebiten.GeoM; m.Translate(x, y); return m }
 
 func (a *app) drawFrame(dst *ebiten.Image) {
 	switch a.game.Screen {
@@ -225,7 +217,7 @@ func (a *app) drawNight(dst *ebiten.Image) {
 	boat := n.Boat
 	if !n.CheckIn && n.PauseTicks == 0 {
 		angle = math.Max(-game.MaxBeamAngle, math.Min(game.MaxBeamAngle, angle+g.Beam.Omega*dt))
-		boat.Advance((1 - .65*n.Fog) * boat.Length / 5400 * dt)
+		boat.Advance((1 - .60*n.Fog) * boat.Length / float64(g.CrossingFullLightTicks()) * dt)
 	}
 	a.spotlight(dst, angle, g.Beam.HalfWidth)
 	for i, s := range n.Sightings {
@@ -267,6 +259,7 @@ func (a *app) drawNight(dst *ebiten.Image) {
 	if boat.Lit {
 		a.imageAt(dst, a.images["glow.png"], px, py, .76)
 	}
+	a.drawWake(dst, px, py, seconds)
 	a.drawBoat(dst, px, py+math.Sin(seconds*2.5)*1.3, math.Sin(seconds*1.3)*.035)
 	a.lamp(dst)
 	for i := 0; i < 5; i++ {

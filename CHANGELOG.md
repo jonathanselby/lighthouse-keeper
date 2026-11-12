@@ -9,3 +9,12 @@
 - Added headless tests, CI workflow and honest UAT/performance release checklist.
 
 This is **not** a certified public release; final graphical and hardware gates are outstanding.
+
+## v0.3 engineering candidate — November 2026
+
+- Replaced flattened/static sea with GPU-bounded animated water and separate immutable rock/shore art.
+- Added independently animated, original-art whitewater and boat wake without a sprite framework.
+- Removed the fixed painted gameplay beam; original movable light remains.
+- Shortened and progressively enlivened crossings, narrowed beam tracking and rescheduled bells.
+- Added reproducible offline art-bake and pixel-immutability acceptance tests.
+- Kept the full original product scope; 60/120 Hz performance and human visual UAT remain outstanding.

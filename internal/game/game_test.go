@@ -246,10 +246,10 @@ func TestBellScheduleBounds(t *testing.T) {
 			count++
 			sec := ticks / 60
 			if i == 0 {
-				if sec < 60 || sec > 75 {
+				if sec < 19 || sec > 28 {
 					t.Fatal(i, sec)
 				}
-			} else if i != 2 && i != 4 || sec < 20 || sec > 50 {
+			} else if i != 2 && i != 4 || sec < 15 || sec > 24 {
 				t.Fatal(i, sec)
 			}
 		}
@@ -457,5 +457,38 @@ func TestEventsMatchStateChanges(t *testing.T) {
 	g.Update(Input{No: true})
 	if len(g.Events) != 1 || g.Events[0] != EvCheckInAnswered || len(g.Night.Answers) != 1 {
 		t.Fatal(g.Events)
+	}
+}
+
+// User acceptance: a lit crossing should progress visibly and require active
+// tracking, without changing the five-crossing or no-failure rules.
+func TestUATCrossingsFasterAndProgressive(t *testing.T) {
+	g := startTestNight(55)
+	first := g.crossingTargetTicks()
+	if first > 3600 || first < 2700 {
+		t.Fatalf("first crossing: %d ticks", first)
+	}
+	g.Night.Crossing = 4
+	if g.crossingTargetTicks() >= first {
+		t.Fatal("later crossings are not faster")
+	}
+	g.Night.Index = 10
+	if g.crossingTargetTicks() >= first {
+		t.Fatal("later nights are not faster")
+	}
+	for i := 0; i < 10; i++ {
+		g.Night.Index = i
+		for c := 0; c < 5; c++ {
+			g.Night.Crossing = c
+			if g.crossingTargetTicks() < 1950 {
+				t.Fatal("unbounded speed")
+			}
+		}
+	}
+}
+func TestUATBeamNarrowerThanOriginal(t *testing.T) {
+	g := startTestNight(1)
+	if !(g.Beam.HalfWidth < 10*math.Pi/180 && g.Beam.HalfWidth > 6*math.Pi/180) {
+		t.Fatalf("first-night beam width: %g radians", g.Beam.HalfWidth)
 	}
 }

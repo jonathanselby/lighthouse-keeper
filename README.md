@@ -81,3 +81,9 @@ MIT. See [`LICENSE`](LICENSE).
 The game uses original 4:3 painterly illustration composites and separately animated boat, lighthouse, sightings, beam and fog. Rendering remains a thin Ebitengine adapter over the unchanged deterministic core. New artwork is made offline via `assets-source/export_premium.py`; see [`ARTWORK.md`](ARTWORK.md) for source provenance, asset inventory and quality gates.
 
 The rendered world is not the game state. A simple presentation-only vertical transform keeps travelling boats over the sea, while the authoritative beam test, timing, rewards, Sightings Book and Harbour Log use exactly the same rules as before. Brass/navy interface panels share one nine-slice image; there is no additional runtime UI or graphics framework.
+
+### Living ocean and revised challenge (v0.3 candidate)
+
+The sea is one painterly painting animated by a bounded GPU water shader. Original stone/shore art is immutable and composited above the moving sea. Rock spray is a tiny, phase-offset sprite atlas drawn around explicit rock impact points. The source picture's fixed spotlight has been removed; the moving beam remains controlled by the game. Courses now become more active while the five-crossing no-failure mechanics, Sightings Book, Log and Keeper's Bell remain intact.
+
+**For developers:** Original ocean art is reproduced from `assets-source/approved-ocean-study.png` by `python assets-source/bake_living_ocean.py` (Python/Pillow/NumPy/OpenCV are only needed to author assets). The binary runtime art is also baked and checked by GitHub Actions. The shipped Linux executable remains offline and needs no Python, packages, internet access or service.

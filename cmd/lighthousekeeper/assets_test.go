@@ -2,8 +2,6 @@ package main
 
 import (
 	"bytes"
-	"crypto/sha256"
-	"fmt"
 	"image"
 	_ "image/jpeg"
 	_ "image/png"
@@ -11,7 +9,7 @@ import (
 )
 
 func TestRequiredArtDecodes(t *testing.T) {
-	required := []string{"title_art.jpg", "seascape.jpg", "beam.png", "boat.png", "fog.png", "lighthouse.png", "sightings.png", "parchment.png", "ui_rail.png", "glow.png", "lantern.png"}
+	required := []string{"title_art.jpg", "seascape.jpg", "beam.png", "boat.png", "fog.png", "lighthouse.png", "sightings.png", "parchment.png", "water-domain.png", "shore-fixed.png", "rocks-fixed.png", "rocks-bottom.png", "impact-atlas.png", "ui_rail.png", "glow.png", "lantern.png"}
 	for _, name := range required {
 		data, err := assetFS.ReadFile("assets/" + name)
 		if err != nil {
@@ -59,8 +57,8 @@ func TestPresentationMappingPreservesOrder(t *testing.T) {
 		}
 		last = got
 	}
-	if sceneY(40) < 250 || sceneY(640) > 650 {
-		t.Fatal("artwork projection outside the painted water")
+	if sceneY(40) < 340 || sceneY(640) > 650 {
+		t.Fatal("artwork projection outside scene bounds")
 	}
 }
 
@@ -82,16 +80,25 @@ func TestViewportPreservesAspect(t *testing.T) {
 	}
 }
 
-func TestSeascapeIsApprovedSinglePainting(t *testing.T) {
-	data, err := assetFS.ReadFile("assets/seascape.jpg")
-	if err != nil {
-		t.Fatal(err)
+func TestLivingOceanArtLayerDimensions(t *testing.T) {
+	want := map[string][2]int{
+		"water-domain.png": {1920, 1440},
+		"impact-atlas.png": {640, 256},
+		"shore-fixed.png":  {1090, 680},
+		"rocks-fixed.png":  {416, 242},
+		"rocks-bottom.png": {650, 150},
 	}
-	// Prevent an old stitched seascape from silently passing CI merely
-	// because it decodes and has the correct pixel dimensions.
-	const expected = "d1ac25cc66411dd87627b26b32b00aa90c527cfa15ab429179220f742818de6a"
-	got := fmt.Sprintf("%x", sha256.Sum256(data))
-	if got != expected {
-		t.Fatalf("seascape source mismatch: %s (expected approved master %s)", got, expected)
+	for name, size := range want {
+		b, e := assetFS.ReadFile("assets/" + name)
+		if e != nil {
+			t.Fatal(e)
+		}
+		c, _, e := image.DecodeConfig(bytes.NewReader(b))
+		if e != nil {
+			t.Fatal(e)
+		}
+		if c.Width != size[0] || c.Height != size[1] {
+			t.Fatalf("%s: %dx%d", name, c.Width, c.Height)
+		}
 	}
 }

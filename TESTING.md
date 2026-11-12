@@ -15,20 +15,20 @@ Headless tests run without a renderer, native window or hardware audio. They exe
 
 ## Integration and hardening gates — outstanding until verified
 
-- [x] Go 1.25+/Ebitengine 2.10.6 module resolution and `go mod tidy` contract (CI `42974831234`).
-- [x] Full `go vet ./...`.
-- [x] Full `go test -race -count=1 ./...`.
-- [x] Linux/amd64 and Linux/arm64 production builds.
-- [x] Embedded asset decode and procedural audio tests under the build toolchain.
-- [x] Production executable Xvfb graphical-launch smoke test (`42974831280`).
-- [ ] Full-screen title and one active-night frame observed; remaining transitions, Book, Harbour Log, Rest, Desk mode and save recovery not yet manually confirmed.
+- [ ] Go 1.25+/Ebitengine 2.10.6 module resolution and `go mod tidy` contract.
+- [ ] Full `go vet ./...`.
+- [ ] Full `go test -race -count=1 ./...`.
+- [ ] Linux/amd64 and Linux/arm64 production builds.
+- [ ] Embedded asset decode and procedural audio tests under the build toolchain.
+- [ ] Production executable Xvfb graphical-launch smoke test.
+- [ ] Full-screen gameplay, visual transitions, Book, Harbour Log, Rest, Desk mode and save recovery manually observed.
 - [ ] Actual 60 Hz hardware frame-time evidence and input responsiveness.
 - [ ] Actual 120 Hz hardware frame-time evidence on a verified 120 Hz display.
 - [ ] Hi-DPI and multiple aspect ratio checks.
 - [ ] A child plays a night without help.
 - [ ] One real 15/25-minute homework session with Keeper's Bell.
 - [ ] Constrained-hardware Garage benchmark (CPU, RAM, GPU memory, frame rate, executable size, scene entity caps).
-- [ ] Original layered artwork approved against five cinematic quality references — **not yet**: actual gameplay frame shows visual seam failures.
+- [ ] Original layered artwork approved against five cinematic quality references.
 
 ## Test evidence required at release
 
@@ -59,28 +59,8 @@ Name the hardware, display refresh/resolution, OS, actual measured FPS/TPS and f
 
 **Gates still open on the changed source:** Go 1.25/Ebitengine CI, graphical launch of the revised binary, actual live motion and high-DPI screenshots, native 60/120 Hz frame-time and responsiveness measurements, child UAT, homework UAT and final owner approval of artistic quality. The previous successful CI and release build must not be represented as covering new unmerged source.
 
-## Premium runtime inspection — 11 November 2026
+## v0.3 UAT remediation gates — 13 November 2026
 
-**Provenance:** source commit `f5029e2999223a2410848931fbaf8ef7f0c8c342`; successful Go CI `42974831234`, successful packaging/Xvfb startup `42974831280`. The GitHub Actions release artifact was downloaded and its actual native executable launched under a software-rendered virtual Linux display (1920×1440).
+**Local checks completed:** Go `GO111MODULE=off go test ./internal/game -count=1` passed with new UAT tests for bounded progressive crossing times and reduced beam width, alongside all existing deterministic rule, bell, fog, persistence and no-failure tests. The self-contained offline art bake ran successfully. `assets-source/test_living_ocean.py` passed: 4,470 fully opaque hero-rock pixels unchanged across sampled water frames; 30,191 sea pixels changed in a measured open-water ROI; the ten atlas poses differ; incremental baked graphics measured at 727,014 bytes. These measurements are offline source-art checks, **not** actual GPU FPS.
 
-**Observed:** the title uses the approved painterly source artwork and legible panel treatment. The first active crossing displays the painted water, harbour, boat, illuminated lighthouse and newly framed HUD, confirming asset decode and rendering. The active scene has obvious horizontal edges from multiple incompatible water-image crops (near the sky-water join and between the successive ocean panels). The result is not a continuous painted environment. The positioned lighthouse and boat still need composition review. **Artistic acceptance fails.**
-
-**Corrective direction:** replace the composite `seascape.jpg` with one coherently composed full-scene painting, rather than stacking unrelated ocean crops; retain independently animated, transparent boat, beam, fog and sightings, and preserve deterministic engine geometry. Validate against a newly captured *running* screenshot and live motion before any release approval.
-
-**Not measured:** a virtual display with software rasterisation is not a 60/120 Hz hardware validation. No real GPU frame-time, input response or mobile/desktop high-refresh numbers are claimed. No child or homework UAT has occurred.
-
-## Historical rendering pass — 12 November 2026 (pending new master upload)
-
-A continuous master seascape was built offline from one original source (`approved-ocean-study.png`) with its fixed decorative boat removed. The master is **1920×1440, 479,359 bytes**, SHA-256 `d1ac25cc66411dd87627b26b32b00aa90c527cfa15ab429179220f742818de6a`. The previous stitched sea was 695,231 bytes; the old 46,208-byte shimmer asset was deleted. Runtime changes use twelve pre-cut low-alpha raster-scrolling strips with subpixel displacement. New source CI and release-candidate gates succeeded at commit `4f262a2c3e2b609d71ec13e3b5ad07c6bc9a6e41`, but that commit still contains the **old seascape binary** and therefore is **not** a verified graphics fix. Only a fresh run after the master image is uploaded can be visually assessed.
-
-**Binary publication gate:** `TestSeascapeIsApprovedSinglePainting` checks SHA-256 of the exact embedded painting. It deliberately fails while GitHub still carries the obsolete stitched asset. Run CI again only after the single-file binary upload; a format/dimension-only test is insufficient to prove the artwork was replaced.
-
-## Seams and horizon correction — verified build, 12 November 2026
-
-**Verified binary:** source commit `2ace3b02c3897d413492b5d4b3baa4ad9a9a4efb`, [CI 43141111942](https://github.com/jonathanselby/lighthouse-keeper/actions/runs/43141111942) and [release-candidate build 43141111944](https://github.com/jonathanselby/lighthouse-keeper/actions/runs/43141111944), both green. The release artifact was downloaded from GitHub and the native Linux executable launched at 1920 × 1440 under Xvfb. A second run verified launch without an audio device, using the application's silent-mode fallback.
-
-**Art integrity:** the uploaded `cmd/lighthousekeeper/assets/seascape.jpg` Git blob `d0891cf9d866283d87d92f64a696e6e7ee59a4a3` matches the authoring-file SHA-256 `d1ac25cc66411dd87627b26b32b00aa90c527cfa15ab429179220f742818de6a` and passes `TestSeascapeIsApprovedSinglePainting`. An inadvertent GUI-upload removal of ten other artworks and addition of `.gitkeep.` were repaired using existing Git blobs in commit `01aa7486` (no artwork regeneration).
-
-**Actual running screenshot findings:** the multiple horizontal stitched-painting seams previously seen are gone. The first real-game screenshot after the asset upload showed a moving boat visually above the painted waterline; the adapter-only mapping was corrected to `sceneY(y) = 235 + .60*y` and the beam transform's vertical factor changed to `.60`. The second captured playable-night image confirms the boat sits within the painted water and the master scene remains continuous. Gameplay-path, beam-hit and fog rules were not modified.
-
-**Still open:** visual beam/boat correspondence over full crossings, animated motion and high-refresh display pacing, sighting-specific art placement, transitions and all other screens, native hardware performance measurements, independent code-derived EDD refresh, and user/child/homework UAT. A graphical screenshot and CI pass do not establish world-class animation quality or 60/120 FPS performance.
+**Open release evidence:** GitHub CI against Go 1.25.0/Ebitengine 2.10.6; native Kage shader compilation and Linux executable startup; at least one complete five-crossing game with two or three bells; inspection of all screens; beam/boat visual agreement at path extremes; 10–15 second actual smooth ocean capture with rocks and whitewater; 60 and 120 Hz real hardware frame pacing and input-response tests; child and homework UAT. Do not mark final graphics quality as accepted based on still previews or offline simulations.

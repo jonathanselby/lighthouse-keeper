@@ -291,7 +291,7 @@ func (g *Game) beginPredict() {
 func (g *Game) startNight() {
 	g.Screen = NightScreen
 	idx := g.Night.Index
-	width := lerp(12, 8, float64(idx)/10) * math.Pi / 180
+	width := lerp(9, 6.5, float64(idx)/10) * math.Pi / 180
 	g.Beam = Beam{HalfWidth: width}
 	// A night has two or three check-ins, scheduled in guaranteed crossings.
 	slots := [3]int{0, 2, 4}
@@ -303,9 +303,9 @@ func (g *Game) startNight() {
 	for i := 0; i < count; i++ {
 		c := slots[i]
 		if c == 0 {
-			g.Night.BellAt[c] = (60 + g.RNG.Intn(16)) * 60
+			g.Night.BellAt[c] = (19 + g.RNG.Intn(10)) * 60
 		} else {
-			g.Night.BellAt[c] = (20 + g.RNG.Intn(31)) * 60
+			g.Night.BellAt[c] = (15 + g.RNG.Intn(10)) * 60
 		}
 	}
 	g.Night.NextSighting = g.nextSightingTick()
@@ -327,6 +327,21 @@ func (g *Game) startCrossing(i int) {
 	g.Beam.Omega = 0
 	g.emit(EvCrossingStart)
 }
+
+// crossingTargetTicks is the full-light crossing duration. The first sea
+// journey remains gentle, then the route becomes more active across the five
+// crossings and later nights; an unlit boat still always arrives.
+func (g *Game) crossingTargetTicks() int {
+	n := g.Night
+	ticks := 3300 - minInt(n.Index, 10)*65 - n.Crossing*150
+	if ticks < 1950 {
+		return 1950
+	}
+	return ticks
+}
+
+// CrossingFullLightTicks exposes duration to the visual interpolation only.
+func (g *Game) CrossingFullLightTicks() int { return g.crossingTargetTicks() }
 
 func (g *Game) updateNight(in Input) {
 	n := &g.Night
@@ -378,7 +393,7 @@ func (g *Game) updateNight(in Input) {
 	if boat.Lit {
 		n.LitTicks[n.Crossing]++
 	}
-	boat.Advance(lerp(1.0, 0.35, n.Fog) * boat.Length / 5400)
+	boat.Advance(lerp(1.0, 0.40, n.Fog) * boat.Length / float64(g.crossingTargetTicks()))
 	g.updateReturn()
 	g.updateSightings(in.Notice)
 	if boat.T >= 1 {
@@ -550,13 +565,13 @@ func (g *Game) makeBoat() Boat {
 		start = Point{X: 930, Y: 80 + g.RNG.Float64()*430}
 	}
 	end := Point{X: HarbourX, Y: HarbourY}
-	offset := lerp(60, 220, float64(n)/10)
+	offset := lerp(125, 270, float64(n)/10)
 	sign := 1.0
 	if g.RNG.Intn(2) == 0 {
 		sign = -1
 	}
-	c1 := Point{X: clamp(lerp(start.X, end.X, 0.34)+sign*offset*.35, 22, 936), Y: clamp(lerp(start.Y, end.Y, 0.34)-offset*.15, 25, 590)}
-	c2 := Point{X: clamp(lerp(start.X, end.X, 0.68)-sign*offset, 22, 936), Y: clamp(lerp(start.Y, end.Y, 0.69)+offset*.11, 25, 590)}
+	c1 := Point{X: clamp(lerp(start.X, end.X, 0.34)+sign*offset*.70, 22, 936), Y: clamp(lerp(start.Y, end.Y, 0.34)-offset*.15, 25, 590)}
+	c2 := Point{X: clamp(lerp(start.X, end.X, 0.68)-sign*offset*1.15, 22, 936), Y: clamp(lerp(start.Y, end.Y, 0.69)+offset*.11, 25, 590)}
 	b := Boat{Path: [4]Point{start, c1, c2, end}}
 	b.Initialise()
 	return b
