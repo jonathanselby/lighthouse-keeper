@@ -115,7 +115,7 @@ bottom_rgba=np.dstack([original,bottom_m])
 export_2x(Image.fromarray(bottom_rgba,'RGBA').crop((450,645,775,720)),'rocks-bottom.png')
 # Replace the static bottom stone inside the moving ocean source.
 m=np.asarray(Image.fromarray(poly_mask(bottom)).filter(ImageFilter.GaussianBlur(3))).astype('float32')/255
-water_donor=cv2.remap(clean,np.clip(X-240,0,W-1).astype('float32'),np.clip(Y-63,0,H-1).astype('float32'),cv2.INTER_LINEAR)
+water_donor=cv2.remap(clean,np.clip(X-50,0,W-1).astype('float32'),np.clip(Y-160,0,H-1).astype('float32'),cv2.INTER_LINEAR)
 clean=np.uint8(np.clip(clean*(1-m[:,:,None])+water_donor*m[:,:,None],0,255))
 export_2x(Image.fromarray(clean,'RGB'),'seascape.jpg',quality=86)
 
