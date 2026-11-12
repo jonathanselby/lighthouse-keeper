@@ -16,6 +16,16 @@ OUT.mkdir(parents=True,exist_ok=True)
 ORIGINAL=ROOT/'assets-source'/'approved-ocean-study.png'
 W,H=960,720
 original=np.asarray(Image.open(ORIGINAL).convert('RGB').crop((395,0,1640,928)).resize((W,H),Image.Resampling.LANCZOS))
+# Remove the source painting's decorative boat BEFORE sampling sky/water donors.
+# The gameplay boat is a separate moving object; source donors must be boat-free.
+boat_x,boat_y,boat_rx,boat_ry=635,407,82,73
+boat_donor=original[boat_y-boat_ry:boat_y+boat_ry+1,405-boat_rx:405+boat_rx+1].copy()
+boat_mask=np.zeros((2*boat_ry+1,2*boat_rx+1),np.uint8)
+cv2.ellipse(boat_mask,(boat_rx,boat_ry),(boat_rx-5,boat_ry-5),0,0,360,255,-1)
+original=cv2.cvtColor(cv2.seamlessClone(
+    cv2.cvtColor(boat_donor,cv2.COLOR_RGB2BGR),
+    cv2.cvtColor(original,cv2.COLOR_RGB2BGR),boat_mask,
+    (boat_x,boat_y),cv2.NORMAL_CLONE),cv2.COLOR_BGR2RGB)
 Y,X=np.mgrid[:H,:W].astype('float32')
 
 def poly_mask(points,feather=0):
@@ -105,7 +115,7 @@ bottom_rgba=np.dstack([original,bottom_m])
 export_2x(Image.fromarray(bottom_rgba,'RGBA').crop((450,645,775,720)),'rocks-bottom.png')
 # Replace the static bottom stone inside the moving ocean source.
 m=np.asarray(Image.fromarray(poly_mask(bottom)).filter(ImageFilter.GaussianBlur(3))).astype('float32')/255
-water_donor=cv2.remap(clean,np.clip(X+270,0,W-1).astype('float32'),np.clip(Y-63,0,H-1).astype('float32'),cv2.INTER_LINEAR)
+water_donor=cv2.remap(clean,np.clip(X-240,0,W-1).astype('float32'),np.clip(Y-63,0,H-1).astype('float32'),cv2.INTER_LINEAR)
 clean=np.uint8(np.clip(clean*(1-m[:,:,None])+water_donor*m[:,:,None],0,255))
 export_2x(Image.fromarray(clean,'RGB'),'seascape.jpg',quality=86)
 
