@@ -9,7 +9,7 @@ import (
 )
 
 func TestRequiredArtDecodes(t *testing.T) {
-	required := []string{"title_art.jpg", "seascape.jpg", "beam.png", "boat.png", "fog.png", "lighthouse.png", "sightings.png", "parchment.png", "shimmer.png", "ui_rail.png", "glow.png", "lantern.png"}
+	required := []string{"title_art.jpg", "seascape.jpg", "beam.png", "boat.png", "fog.png", "lighthouse.png", "sightings.png", "parchment.png", "ui_rail.png", "glow.png", "lantern.png"}
 	for _, name := range required {
 		data, err := assetFS.ReadFile("assets/" + name)
 		if err != nil {

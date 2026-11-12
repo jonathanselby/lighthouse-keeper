@@ -125,22 +125,23 @@ func (a *app) spotlight(dst *ebiten.Image, angle, halfWidth float64) {
 }
 
 func (a *app) drawSea(dst *ebiten.Image) {
+	// A single original painterly scene, with zero joined horizons or scroll tiles.
 	dst.DrawImage(a.images["seascape.jpg"], nil)
-	shimmer := a.images["shimmer.png"]
-	if shimmer == nil {
-		return
-	}
-	secs := float64(time.Now().UnixNano()) / 1e9
-	// Sparse drifting painted water glints, not thousands of runtime arcs.
-	for row := 0; row < 4; row++ {
-		for col := 0; col < 4; col++ {
-			x := float64(col*520) - 60 + math.Sin(secs*.19+float64(row)*1.8)*12
-			y := 350 + float64(row*245) + math.Sin(secs*.24+float64(col))*4
-			op := &ebiten.DrawImageOptions{Filter: ebiten.FilterLinear}
-			op.GeoM.Translate(x, y)
-			op.ColorScale.ScaleAlpha(.26)
-			dst.DrawImage(shimmer, op)
+
+	// Historic raster-strip scrolling, implemented with the existing sprite draw.
+	// Twelve translucent strips move by just a few pixels; no fluid simulation,
+	// per-pixel CPU loop, custom shader, extra texture or gameplay state.
+	seconds := float64(time.Now().UnixNano()) / 1e9
+	for i, band := range a.water {
+		if band == nil {
+			continue
 		}
+		phase := seconds*.56 + float64(i)*.82
+		dx := math.Sin(phase)*3.0 + math.Sin(phase*.31)*1.4
+		op := &ebiten.DrawImageOptions{Filter: ebiten.FilterLinear}
+		op.GeoM.Translate(440+dx, float64(754+i*31))
+		op.ColorScale.ScaleAlpha(float32(.10 + .06*(1+math.Sin(phase*.73))*.5))
+		dst.DrawImage(band, op)
 	}
 }
 

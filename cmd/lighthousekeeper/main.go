@@ -30,6 +30,7 @@ type app struct {
 	images               map[string]*ebiten.Image
 	sightseeing          [6]*ebiten.Image
 	rail                 [9]*ebiten.Image
+	water                [12]*ebiten.Image // Fixed water bands, prepared once
 	heading, font, small font.Face
 	audio                *soundBank
 	savePath             string
@@ -61,7 +62,7 @@ func main() {
 		log.Printf("journal recovery: %v", loadErr)
 		a.saveMessage = game.UIText[25]
 	}
-	for _, name := range []string{"seascape.jpg", "title_art.jpg", "lighthouse.png", "boat.png", "sightings.png", "parchment.png", "beam.png", "fog.png", "shimmer.png", "ui_rail.png", "glow.png", "lantern.png"} {
+	for _, name := range []string{"seascape.jpg", "title_art.jpg", "lighthouse.png", "boat.png", "sightings.png", "parchment.png", "beam.png", "fog.png", "ui_rail.png", "glow.png", "lantern.png"} {
 		data, e := assetFS.ReadFile("assets/" + name)
 		if e != nil {
 			log.Fatalf("required art %s: %v", name, e)
@@ -83,6 +84,13 @@ func main() {
 		for i := 0; i < 3; i++ {
 			a.rail[j*3+i] = rail.SubImage(image.Rect(xp[i], yp[j], xp[i+1], yp[j+1])).(*ebiten.Image)
 		}
+	}
+	// Mega Drive-style per-strip water sampling; no frame textures or shader engine.
+	// Every band comes from the same continuous painting. Static cliffs and harbour
+	// stay outside these bounds, so there is no moving edge across the landscape.
+	for i := range a.water {
+		y := 754 + i*31
+		a.water[i] = a.images["seascape.jpg"].SubImage(image.Rect(440, y, 1480, y+31)).(*ebiten.Image)
 	}
 	a.heading = loadFont(gobold.TTF, 56)
 	a.font = loadFont(goregular.TTF, 36)
