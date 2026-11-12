@@ -68,3 +68,7 @@ Name the hardware, display refresh/resolution, OS, actual measured FPS/TPS and f
 **Corrective direction:** replace the composite `seascape.jpg` with one coherently composed full-scene painting, rather than stacking unrelated ocean crops; retain independently animated, transparent boat, beam, fog and sightings, and preserve deterministic engine geometry. Validate against a newly captured *running* screenshot and live motion before any release approval.
 
 **Not measured:** a virtual display with software rasterisation is not a 60/120 Hz hardware validation. No real GPU frame-time, input response or mobile/desktop high-refresh numbers are claimed. No child or homework UAT has occurred.
+
+## Historical rendering pass — 12 November 2026 (pending new master upload)
+
+A continuous master seascape was built offline from one original source (`approved-ocean-study.png`) with its fixed decorative boat removed. The master is **1920×1440, 479,359 bytes**, SHA-256 `d1ac25cc66411dd87627b26b32b00aa90c527cfa15ab429179220f742818de6a`. The previous stitched sea was 695,231 bytes; the old 46,208-byte shimmer asset was deleted. Runtime changes use twelve pre-cut low-alpha raster-scrolling strips with subpixel displacement. New source CI and release-candidate gates succeeded at commit `4f262a2c3e2b609d71ec13e3b5ad07c6bc9a6e41`, but that commit still contains the **old seascape binary** and therefore is **not** a verified graphics fix. Only a fresh run after the master image is uploaded can be visually assessed.

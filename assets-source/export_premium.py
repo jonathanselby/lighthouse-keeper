@@ -5,9 +5,7 @@ Baking is offline only. The shipping Go executable embeds the resulting images;
 no runtime image processor, external asset service, or shader library is needed.
 """
 from pathlib import Path
-import math
-import random
-from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageOps
+from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
 import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -18,24 +16,6 @@ A = Image.open(SOURCES / "concept-approved.png").convert("RGB")
 B = Image.open(SOURCES / "approved-ocean-study.png").convert("RGB")
 C = Image.open(SOURCES / "original-ui-study.png").convert("RGB")
 W, H = 1920, 1440
-RNG = random.Random(3301)
-
-
-def feathered_paste(dst, src, where, feather=70):
-    w, h = src.size
-    mask = Image.new("L", (w, h), 255)
-    if feather:
-        m = np.ones((h,w), dtype=np.float32) * 255
-        edge = min(feather, w//5, h//5)
-        if edge:
-            for k in range(edge):
-                a = int(255 * (k/edge)**1.7)
-                m[k,:] = np.minimum(m[k,:], a)
-                m[-k-1,:] = np.minimum(m[-k-1,:], a)
-                m[:,k] = np.minimum(m[:,k], a)
-                m[:,-k-1] = np.minimum(m[:,-k-1], a)
-            mask=Image.fromarray(m.astype('uint8'))
-    dst.paste(src, where, mask)
 
 
 def paint_cutout(img, bounds, outline, feather=2):
@@ -48,55 +28,8 @@ def paint_cutout(img, bounds, outline, feather=2):
     cut.putalpha(m)
     return cut
 
-# A calmer sky and a much larger painted ocean, without code-generated wave arcs.
-# Every boat path now appears against water, rather than crossing a large blank sky.
-sky = A.crop((0, 0, 955, 310)).resize((W, 305), Image.Resampling.LANCZOS)
-scene = Image.new('RGB',(W,H),(8,31,49))
-scene.paste(sky, (0,0))
-# Source-aligned open-water painting. Layer bands with broad, softened overlaps.
-water_sections = [
-    (B,(470, 615, 1580, 850), 258, 620),
-    (A,(45, 650, 950, 920), 525, 1110),
-    (B,(390, 660, 1525, 925), 1020, 1500),
-]
-for src,crop,ystart,yend in water_sections:
-    raw=src.crop(crop)
-    scaled=raw.resize((W, yend-ystart), Image.Resampling.LANCZOS)
-    feathered_paste(scene, scaled, (0,ystart), 95)
-# Atmospheric mist at horizon (no physical sea motion baked into gameplay rules).
-veil = Image.new('RGBA',(W,H),(0,0,0,0)); vd=ImageDraw.Draw(veil,'RGBA')
-for i in range(160):
-    y=265+i
-    alpha=int(20*math.sin(math.pi*i/160)**2)
-    vd.line((0,y,W,y),fill=(159,187,194,alpha))
-scene=Image.alpha_composite(scene.convert('RGBA'),veil)
-# A distant right-hand harbour, its painted windows and shoreline still intact.
-# The feathered transfer uses original painting, not replacement geometry.
-harbour = A.crop((445, 370, 895, 602)).resize((720, 390), Image.Resampling.LANCZOS)
-feathered_paste(scene,harbour,(1280,765),150)
-# Frame the keeper's bay with naturally painted rocks, not vector blobs.
-rock_right = A.crop((1270, 617, 1648, 928)).resize((580, 478), Image.Resampling.LANCZOS)
-feathered_paste(scene,rock_right,(1440,1010),115)
-rock_left = B.crop((0, 610, 340, 928)).resize((470, 430), Image.Resampling.LANCZOS)
-feathered_paste(scene,rock_left,(-50,1110),110)
-# Low-frequency light and vignette: premium atmosphere without a realtime bloom pass.
-a = np.asarray(scene.convert('RGB'),dtype=np.float32).copy()
-yy, xx = np.ogrid[:H,:W]
-dx=(xx-W/2)/(W/2); dy=(yy-H/2)/(H/2)
-v = np.clip(1-.12*(dx*dx+dy*dy)**1.25,.77,1)
-a *= v[...,None]
-scene = Image.fromarray(np.uint8(np.clip(a,0,255)),'RGB')
-scene.save(OUT/'seascape.jpg', quality=89, optimize=True, subsampling=0)
-
-# Small moving water-light texture. Its gentle drift is visual-only.
-overlay=Image.new('RGBA',(540,180),(0,0,0,0))
-od=ImageDraw.Draw(overlay,'RGBA')
-for i in range(115):
-    x=RNG.randrange(540); y=RNG.randrange(180)
-    rx=RNG.randrange(5,48)
-    od.arc((x-rx/2,y-3,x+rx,y+7),180,330,fill=(243,221,167,RNG.randrange(15,55)),width=RNG.choice([1,2]))
-overlay=overlay.filter(ImageFilter.GaussianBlur(1.2))
-overlay.save(OUT/'shimmer.png',optimize=True)
+# The game backdrop is now exported separately by export_master_scene.py.
+# No stitched horizon, shader pipeline, or generated water texture.
 
 # Cut an actual illustrated lighthouse lantern from the original maritime study.
 # It sits in the foreground with the core gameplay beam originating inside it.

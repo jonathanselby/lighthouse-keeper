@@ -73,3 +73,11 @@ Unobserved hardware, visual and child tests remain unchecked. The repository may
 - **FAIL — art direction:** gameplay background shows conspicuous horizontal collage seams, especially between sky, middle waves and foreground. The lighthouse sits awkwardly at the bottom edge and the boat appears near the shore. This is not yet the cohesive premium game artwork required by the PRD.
 - This proves startup and first-screen rendering only. It does not prove normal 60/120 Hz hardware frame pacing or all-screen UAT.
 - No public release tag is authorised until the repaired running scene, hardware performance and required human UAT are accepted.
+
+## Historical rendering pass — 12 November 2026
+
+- [x] Cut repetitive shimmering asset and simplified effect to twelve tiny moving water bands.
+- [x] Go CI and Linux graphical launch workflow green after renderer change (`4f262a2`).
+- [ ] Replace `cmd/lighthousekeeper/assets/seascape.jpg` with the original single-scene master (SHA-256 `d1ac25cc66411dd87627b26b32b00aa90c527cfa15ab429179220f742818de6a`). **The current GitHub binary is still the rejected stitched scene.**
+- [ ] Inspect actual new native running screenshot for continuity, duplicate lights, lamp and boat alignment, wildlife readability and all-screen presentation.
+- [ ] Native 60/120 Hz testing; no display refresh or FPS success is claimed.

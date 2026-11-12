@@ -597,3 +597,9 @@ The beam is the attention, the boat is the task, the sightings are the world bei
 **Engineering conclusion:** a small rules engine can support a lavish-looking game when most artistic complexity is authored once, outside runtime; the runtime only moves, blends and displays a few carefully made layers. The success condition is *premium visual quality and measured 60/120 Hz fluidity with the entire PRD intact*, not an impressive number of abstractions removed.
 
 > **Does every piece of machinery remove more complexity than it introduces?**
+
+## 30. Historical renderer simplification — pending visual acceptance
+
+The final scene is one coherent authored 1920 × 1440 JPEG from an original painterly source (not three stitched ocean paintings). A short offline script removes the source's decorative boat using same-horizon water; dynamic boat, spotlight, fog, sightings, lantern and HUD remain distinct. The old `shimmer.png` texture and sixteen glint drawings have been deleted. Motion instead uses **twelve prepared image subregions** drawn with bounded horizontal sine offsets and very low alpha over their original location. This directly reuses Ebitengine's existing `SubImage` and `DrawImage`; no shaders, 3D engine, physics or runtime asset pipeline. The painted scene is 479,359 bytes compared with the previous 695,231-byte stitched image (~31% reduction for that asset). The gameplay core is unchanged.
+
+**Acceptance:** full CI, real executable screenshots and continuous gameplay inspection, 60 Hz / 120 Hz hardware frame pacing, child play and homework UAT remain separate gates. A successful artist-side preview is not release proof.
