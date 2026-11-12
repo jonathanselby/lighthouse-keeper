@@ -79,7 +79,9 @@ func (a *app) panel(dst *ebiten.Image, x, y, w, h float64) {
 // This affine presentation transform keeps every simulated boat in the water.
 // It is applied equally to all visible gameplay objects and the light cone;
 // gameplay geometry and deterministic collision decisions remain unchanged.
-func sceneY(y float64) float64 { return 124 + y*.79 }
+// Map logical water coordinates into the painting’s ocean, below the horizon.
+// Apply the same affine slope to the light cone; the simulation remains untouched.
+func sceneY(y float64) float64 { return 235 + y*.60 }
 
 func (a *app) drawLantern(dst *ebiten.Image, x, y, scale float64, lit bool) {
 	img := a.images["lantern.png"]
@@ -119,7 +121,7 @@ func (a *app) spotlight(dst *ebiten.Image, angle, halfWidth float64) {
 	op.GeoM.Scale(1.18*halfWidth/(12*math.Pi/180), 1.17)
 	op.GeoM.Rotate(angle)
 	// Same transform as dynamic boat positions: visual and logical aim agree.
-	op.GeoM.Scale(1, .79)
+	op.GeoM.Scale(1, .60)
 	op.GeoM.Translate(game.LampX*renderScale, sceneY(game.LampY)*renderScale)
 	dst.DrawImage(img, op)
 }

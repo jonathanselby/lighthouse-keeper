@@ -59,8 +59,8 @@ func TestPresentationMappingPreservesOrder(t *testing.T) {
 		}
 		last = got
 	}
-	if sceneY(40) < 130 || sceneY(640) > 650 {
-		t.Fatal("artwork projection outside scene bounds")
+	if sceneY(40) < 250 || sceneY(640) > 650 {
+		t.Fatal("artwork projection outside the painted water")
 	}
 }
 
