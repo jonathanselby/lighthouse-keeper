@@ -81,3 +81,5 @@ Unobserved hardware, visual and child tests remain unchecked. The repository may
 - [ ] Replace `cmd/lighthousekeeper/assets/seascape.jpg` with the original single-scene master (SHA-256 `d1ac25cc66411dd87627b26b32b00aa90c527cfa15ab429179220f742818de6a`). **The current GitHub binary is still the rejected stitched scene.**
 - [ ] Inspect actual new native running screenshot for continuity, duplicate lights, lamp and boat alignment, wildlife readability and all-screen presentation.
 - [ ] Native 60/120 Hz testing; no display refresh or FPS success is claimed.
+
+- [ ] New SHA-256 asset acceptance test green (intentionally fails until replacement `seascape.jpg` is uploaded).
