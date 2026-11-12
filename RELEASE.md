@@ -78,8 +78,22 @@ Unobserved hardware, visual and child tests remain unchecked. The repository may
 
 - [x] Cut repetitive shimmering asset and simplified effect to twelve tiny moving water bands.
 - [x] Go CI and Linux graphical launch workflow green after renderer change (`4f262a2`).
-- [ ] Replace `cmd/lighthousekeeper/assets/seascape.jpg` with the original single-scene master (SHA-256 `d1ac25cc66411dd87627b26b32b00aa90c527cfa15ab429179220f742818de6a`). **The current GitHub binary is still the rejected stitched scene.**
+- [x] Replace `cmd/lighthousekeeper/assets/seascape.jpg` with the approved single-scene master (SHA-256 `d1ac25cc66411dd87627b26b32b00aa90c527cfa15ab429179220f742818de6a`), verified by CI.
 - [ ] Inspect actual new native running screenshot for continuity, duplicate lights, lamp and boat alignment, wildlife readability and all-screen presentation.
 - [ ] Native 60/120 Hz testing; no display refresh or FPS success is claimed.
 
-- [ ] New SHA-256 asset acceptance test green (intentionally fails until replacement `seascape.jpg` is uploaded).
+- [x] New SHA-256 asset acceptance test green following upload and repair (CI `43141111942`).
+
+## Verified single-scene graphics candidate — 12 November 2026
+
+- [x] Restore missing runtime artwork after GitHub browser replacement; remove invalid `.gitkeep.`.
+- [x] CI and GitHub native release-candidate build green at `2ace3b02` (runs `43141111942`, `43141111944`).
+- [x] Capture actual running title and first-night screenshots from downloaded release-candidate executable, 1920 × 1440 Xvfb.
+- [x] Confirm old horizontal painting joins are absent in the night screen.
+- [x] Correct presentation-only boat vertical projection; verify in a second actual running screenshot that the boat lies in the painted sea.
+- [x] Verify local startup silently without an audio device.
+- [ ] Verify light cone and authoritative beam hit-testing match across a whole crossing.
+- [ ] Review animation quality, sighting positioning, all screen transitions and real 60/120 Hz hardware performance.
+- [ ] Child-play and homework-session UAT.
+- [ ] Regenerate source-pinned implementation EDD and comparison after final accepted source.
+- [ ] Approve premium art quality before public release; current build remains a **candidate**.
