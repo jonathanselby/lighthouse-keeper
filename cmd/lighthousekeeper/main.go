@@ -32,6 +32,7 @@ type app struct {
 	game                 *game.Game
 	images               map[string]*ebiten.Image
 	sightseeing          [6]*ebiten.Image
+	liveSightings        [6]*ebiten.Image
 	impacts              [10]*ebiten.Image
 	waterShader          *ebiten.Shader
 	waterOptions         ebiten.DrawRectShaderOptions
@@ -67,7 +68,7 @@ func main() {
 		log.Printf("journal recovery: %v", loadErr)
 		a.saveMessage = game.UIText[25]
 	}
-	for _, name := range []string{"seascape.jpg", "title_art.jpg", "lighthouse.png", "boat.png", "sightings.png", "parchment.png", "beam.png", "fog.png", "water-domain.png", "rocks-fixed.png", "rocks-bottom.png", "shore-fixed.png", "impact-atlas.png", "ui_rail.png", "glow.png", "lantern.png"} {
+	for _, name := range []string{"seascape.jpg", "title_art.jpg", "lighthouse.png", "boat.png", "sightings.png", "sightings-live.png", "parchment.png", "beam.png", "fog.png", "water-domain.png", "rocks-fixed.png", "rocks-bottom.png", "shore-fixed.png", "impact-atlas.png", "ui_rail.png", "glow.png", "lantern.png"} {
 		data, e := assetFS.ReadFile("assets/" + name)
 		if e != nil {
 			log.Fatalf("required art %s: %v", name, e)
@@ -80,6 +81,7 @@ func main() {
 	}
 	for i := 0; i < 6; i++ {
 		a.sightseeing[i] = a.images["sightings.png"].SubImage(image.Rect(240*i, 0, 240*(i+1), 240)).(*ebiten.Image)
+		a.liveSightings[i] = a.images["sightings-live.png"].SubImage(image.Rect(240*i, 0, 240*(i+1), 240)).(*ebiten.Image)
 	}
 	// Prepare brass-panel nine-slice regions once, not on every draw.
 	rail := a.images["ui_rail.png"]

@@ -47,7 +47,7 @@ func (g *Game) updateSightings(notice bool) {
 		s.Age++
 		switch s.State {
 		case Appearing:
-			if s.Age >= 24 {
+			if s.Age >= 48 {
 				s.State = Visible
 			}
 		case Visible:
@@ -113,40 +113,33 @@ func (g *Game) updateSightings(notice bool) {
 		n.NextSighting = g.nextSightingTick()
 	}
 }
+// Habitat-specific positions authored against the approved sea/shore painting.
+// Sea animals cannot be placed on land. Seal remains on nearshore rocks (FR4).
+func (g *Game) sightingPosition(kind Kind) Point {
+ switch kind {
+ case Whale,Jellyfish: return Point{X:415+g.RNG.Float64()*340,Y:205+g.RNG.Float64()*245}
+ case Seal: return Point{X:240+g.RNG.Float64()*80,Y:510+g.RNG.Float64()*55}
+ case Ferry: return Point{X:540+g.RNG.Float64()*240,Y:215+g.RNG.Float64()*210}
+ case Owl: return Point{X:65+g.RNG.Float64()*75,Y:160+g.RNG.Float64()*140}
+ default: return Point{X:330+g.RNG.Float64()*390,Y:20+g.RNG.Float64()*70}
+ }
+}
 func (g *Game) spawnSighting() {
-	n := &g.Night
-	var p Point
-	ok := false
-	for attempt := 0; attempt < 12; attempt++ {
-		switch g.RNG.Intn(3) {
-		case 0:
-			p = Point{X: 32 + g.RNG.Float64()*896, Y: 28 + g.RNG.Float64()*112}
-		case 1:
-			p = Point{X: 24 + g.RNG.Float64()*115, Y: 34 + g.RNG.Float64()*495}
-		default:
-			p = Point{X: 820 + g.RNG.Float64()*116, Y: 34 + g.RNG.Float64()*495}
-		}
-		if clearOfPath(p, n.Boat.Path, 160) {
-			ok = true
-			break
-		}
-	}
-	if !ok {
-		return
-	}
-	// Whale, seal and jellyfish are most common; a shooting star is rare.
-	weights := [6]int{5, 1, 5, 5, 2, 2}
-	draw := g.RNG.Intn(20)
-	var kind Kind
-	for i, w := range weights {
-		if draw < w {
-			kind = Kind(i)
-			break
-		}
-		draw -= w
-	}
-	n.Sightings = append(n.Sightings, Sighting{Kind: kind, Pos: p, Life: (6 + g.RNG.Intn(4)) * 60})
-	g.emit(EvSightingAppear)
+ n:=&g.Night
+ weights:=[6]int{5,1,5,5,2,2}
+ draw:=g.RNG.Intn(20)
+ var kind Kind
+ for i,w:=range weights {
+   if draw<w {kind=Kind(i);break}
+   draw-=w
+ }
+ for attempt:=0;attempt<24;attempt++ {
+   p:=g.sightingPosition(kind)
+   if !clearOfPath(p,n.Boat.Path,115) {continue}
+   n.Sightings=append(n.Sightings,Sighting{Kind:kind,Pos:p,Life:(6+g.RNG.Intn(4))*60})
+   g.emit(EvSightingAppear)
+   return
+ }
 }
 func clearOfPath(p Point, path [4]Point, minDistance float64) bool {
 	prev := Bezier(path, 0)

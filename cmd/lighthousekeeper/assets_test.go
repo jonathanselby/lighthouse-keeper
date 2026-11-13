@@ -6,10 +6,12 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 	"testing"
+
+	"github.com/jonathanselby/lighthouse-keeper/internal/game"
 )
 
 func TestRequiredArtDecodes(t *testing.T) {
-	required := []string{"title_art.jpg", "seascape.jpg", "beam.png", "boat.png", "fog.png", "lighthouse.png", "sightings.png", "parchment.png", "water-domain.png", "shore-fixed.png", "rocks-fixed.png", "rocks-bottom.png", "impact-atlas.png", "ui_rail.png", "glow.png", "lantern.png"}
+	required := []string{"title_art.jpg", "seascape.jpg", "beam.png", "boat.png", "sightings-live.png", "fog.png", "lighthouse.png", "sightings.png", "parchment.png", "water-domain.png", "shore-fixed.png", "rocks-fixed.png", "rocks-bottom.png", "impact-atlas.png", "ui_rail.png", "glow.png", "lantern.png"}
 	for _, name := range required {
 		data, err := assetFS.ReadFile("assets/" + name)
 		if err != nil {
@@ -32,6 +34,7 @@ func TestPainterlyAtlasDimensions(t *testing.T) {
 		{"seascape.jpg", 1920, 1440},
 		{"title_art.jpg", 1920, 1440},
 		{"sightings.png", 1440, 240},
+		{"sightings-live.png", 1440, 240},
 		{"ui_rail.png", 960, 220},
 	} {
 		data, err := assetFS.ReadFile("assets/" + item.name)
@@ -101,4 +104,20 @@ func TestLivingOceanArtLayerDimensions(t *testing.T) {
 			t.Fatalf("%s: %dx%d", name, c.Width, c.Height)
 		}
 	}
+}
+
+func TestWaterShaderClockHasSubFramePrecision(t *testing.T) {
+ for _,ticks:=range []uint64{0,60,3600,216000} {
+  a,b,c:=presentationClock(ticks,0),presentationClock(ticks,.5),presentationClock(ticks+1,0)
+  if !(a<b&&b<c) {t.Fatalf("frozen shader at %d: %f %f %f",ticks,a,b,c)}
+ }
+}
+func TestWaterSightingEmergenceIsContinuous(t *testing.T) {
+ previous:=-1.0
+ for age:=0;age<=48;age++ {
+  p:=emergenceProgress(game.Sighting{State:game.Appearing,Age:age})
+  if p<previous||p<0||p>1 {t.Fatalf("jump %d %f",age,p)}
+  previous=p
+ }
+ if previous!=1 {t.Fatal("did not finish")}
 }

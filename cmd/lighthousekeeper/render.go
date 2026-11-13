@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"image/color"
 	"math"
-	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -127,7 +126,7 @@ func (a *app) spotlight(dst *ebiten.Image, angle, halfWidth float64) {
 func (a *app) drawSea(dst *ebiten.Image) {
 	// CPS/Amiga priority planes: water samples CLEAN paint, then explicit
 	// spray is drawn behind and in front of separate, immutable stone art.
-	seconds := float64(time.Now().UnixNano()) / 1e9
+	seconds := float64(a.presentationClock())
 	a.drawLivingWater(dst)
 	a.drawImpacts(dst, true, seconds)
 	dst.DrawImage(a.images["shore-fixed.png"], &ebiten.DrawImageOptions{GeoM: moved(0, 760)})
@@ -212,7 +211,7 @@ func (a *app) drawNight(dst *ebiten.Image) {
 	g := a.game
 	n := &g.Night
 	dt := a.subTick()
-	seconds := float64(time.Now().UnixNano()) / 1e9
+	seconds := float64(a.presentationClock())
 	angle := g.Beam.Angle
 	boat := n.Boat
 	if !n.CheckIn && n.PauseTicks == 0 {
@@ -221,28 +220,7 @@ func (a *app) drawNight(dst *ebiten.Image) {
 	}
 	a.spotlight(dst, angle, g.Beam.HalfWidth)
 	for i, s := range n.Sightings {
-		im := a.sightseeing[s.Kind]
-		if im == nil {
-			continue
-		}
-		opacity := float32(1)
-		if s.State == game.Appearing {
-			opacity = float32(math.Min(1, float64(s.Age)/24))
-		}
-		if s.State == game.Leaving || s.State == game.Chased {
-			opacity = float32(math.Max(0, 1-float64(s.Age)/30))
-		}
-		wobble := math.Sin(seconds*1.05+float64(i)*1.9) * 2.8
-		op := &ebiten.DrawImageOptions{Filter: ebiten.FilterLinear}
-		w, h := im.Bounds().Dx(), im.Bounds().Dy()
-		op.GeoM.Translate(-float64(w)/2, -float64(h)/2)
-		op.GeoM.Scale(.94, .94)
-		op.GeoM.Translate(s.Pos.X*renderScale, (sceneY(s.Pos.Y)+wobble)*renderScale)
-		op.ColorScale.ScaleAlpha(opacity)
-		dst.DrawImage(im, op)
-		if s.State == game.Noticed {
-			a.imageAt(dst, a.images["glow.png"], s.Pos.X, sceneY(s.Pos.Y), .67)
-		}
+		a.drawLiveSighting(dst, s, i, seconds)
 	}
 	p := boat.Position()
 	px, py := p.X, sceneY(p.Y)

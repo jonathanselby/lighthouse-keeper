@@ -5,7 +5,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"image"
 	"math"
-	"time"
 )
 
 // Exactly five reusable impact locations. These are visual-only. All stone is
@@ -50,7 +49,8 @@ func (a *app) drawLivingWater(dst *ebiten.Image) {
 		dst.DrawImage(a.images["seascape.jpg"], nil)
 		return
 	}
-	a.waterOptions.Uniforms["Clock"] = float32(float64(time.Now().UnixNano()) / 1e9)
+	// Epoch seconds rounded to float32 freeze for ~128 seconds at current dates.
+	a.waterOptions.Uniforms["Clock"] = a.presentationClock()
 	dst.DrawRectShader(1920, 1440, a.waterShader, &a.waterOptions)
 }
 
@@ -99,3 +99,11 @@ func (a *app) drawWake(dst *ebiten.Image, x, y float64, sec float64) {
 	s := impact{x: x - 24, y: y + 14, w: 105, h: 43, pose: 0, phase: .18, behind: false}
 	a.drawOneImpact(dst, s, sec)
 }
+
+ // Relative presentation time retains subframe precision, unlike epoch seconds.
+ func presentationClock(ticks uint64, fractionalTick float64) float32 {
+     return float32((float64(ticks)+fractionalTick)/60)
+ }
+ func (a *app) presentationClock() float32 {
+     return presentationClock(a.frame,a.subTick())
+ }
