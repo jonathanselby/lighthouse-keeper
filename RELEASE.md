@@ -90,3 +90,13 @@ Unobserved hardware, visual and child tests remain unchecked. The repository may
 - [ ] Full-scene real-time visual inspection of all rock/spray areas and dynamic beam alignment.
 - [ ] 60/120 Hz native hardware pacing, gameplay feel, child and homework UAT.
 - [ ] Final release approval. **This is a candidate, not a signed-off release.**
+
+## v0.4 UAT graphics remediation — 13 November 2026
+
+The prior build's shader passed absolute Unix epoch seconds (about 1.8 billion) into a float32 uniform, which quantises time in roughly 128-second increments and freezes waves. The GPU clock now uses relative 60 TPS frame count plus fractional tick for high-refresh presentation; spray and water share the clock. Deterministic simulation is untouched.
+
+The moving boat previously included a static painted wake, and the six live sighting sprites were circular illustrated scenes with fixed land/water/spray. Offline reproducible asset authoring now extracts the boat and six transparent subjects. The Sightings Book retains its original illustrated atlas. The water/spray/wake remain separate animations.
+
+Spawn selection is now kind-first, with explicit approved-art habitats: whale/jellyfish/ferry on open water; seal on nearshore rock; owl on cliff; shooting star in sky. Aquatic sightings rise across 48 ticks, with waterline cropping and separately animated spray; departing sightings submerge. Notice, chase, progress, saved book/log, crossing speeds and beam difficulty remain unchanged.
+
+New acceptance gates: 600-seed habitat regression; 48-tick emergence regression; sub-frame shader clock precision; offline transparency and water-domain assertions; unchanged layered-rock checks. Real hardware 60/120 Hz pacing, whole-night visual UAT, child UAT and final artistic sign-off remain open.

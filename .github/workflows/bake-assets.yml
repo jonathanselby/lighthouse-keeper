@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'assets-source/bake_living_ocean.py'
+      - 'assets-source/bake_moving_subjects.py'
       - '.github/workflows/bake-assets.yml'
 permissions:
   contents: write
@@ -27,6 +28,8 @@ jobs:
           python -m pip install --disable-pip-version-check numpy==2.2.6 pillow==11.3.0 opencv-python-headless==4.12.0.88
           python assets-source/bake_living_ocean.py
           python assets-source/test_living_ocean.py
+          python assets-source/bake_moving_subjects.py
+          python assets-source/test_moving_subjects.py
       - name: Publish baked binaries (no browser upload)
         run: |
           set -euo pipefail
@@ -37,7 +40,9 @@ jobs:
             cmd/lighthousekeeper/assets/shore-fixed.png \
             cmd/lighthousekeeper/assets/rocks-fixed.png \
             cmd/lighthousekeeper/assets/rocks-bottom.png \
-            cmd/lighthousekeeper/assets/impact-atlas.png
+            cmd/lighthousekeeper/assets/impact-atlas.png \
+            cmd/lighthousekeeper/assets/boat.png \
+            cmd/lighthousekeeper/assets/sightings-live.png
           if git diff --cached --quiet; then
             echo "Baked art already current"
           else

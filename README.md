@@ -87,3 +87,7 @@ The rendered world is not the game state. A simple presentation-only vertical tr
 The sea is one painterly painting animated by a bounded GPU water shader. Original stone/shore art is immutable and composited above the moving sea. Rock spray is a tiny, phase-offset sprite atlas drawn around explicit rock impact points. The source picture's fixed spotlight has been removed; the moving beam remains controlled by the game. Courses now become more active while the five-crossing no-failure mechanics, Sightings Book, Log and Keeper's Bell remain intact.
 
 **For developers:** Original ocean art is reproduced from `assets-source/approved-ocean-study.png` by `python assets-source/bake_living_ocean.py` (Python/Pillow/NumPy/OpenCV are only needed to author assets). The binary runtime art is also baked and checked by GitHub Actions. The shipped Linux executable remains offline and needs no Python, packages, internet access or service.
+
+### v0.4 UAT graphics candidate
+
+The moving ocean shader now uses relative presentation time, with separate fixed rocks and animated spray. Boat and sighting sprites contain no painted sea; the Sightings Book remains illustrated. Water animals emerge from approved open-water positions; seal, owl and shooting star use their intended habitats. Final visual and hardware UAT is still required.

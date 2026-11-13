@@ -46,3 +46,13 @@ Before public release, capture actual running footage of all screens and compare
 **Paint ordering:** clean water shader → rear spray → immutable rock and shoreline PNG cut-outs → foreground spray → the original moving spotlight and boat. Static stone never enters the animated texture. All significant spray on rocks must be separately animated, not flattened under it. The whitewater atlas uses original project art and is a visual overlay, not a particle engine.
 
 This authoring pipeline requires only build-time Python, Pillow, NumPy and OpenCV. It is run by the art-bake GitHub workflow and validated by `assets-source/test_living_ocean.py`. Native end users only receive one Linux executable with embedded assets, and need no Python or internet connection. If the rebuilt illustrations are visually unsatisfactory, improve the one-time painting, never add a runtime classifier to compensate.
+
+## v0.4 UAT graphics remediation — 13 November 2026
+
+The prior build's shader passed absolute Unix epoch seconds (about 1.8 billion) into a float32 uniform, which quantises time in roughly 128-second increments and freezes waves. The GPU clock now uses relative 60 TPS frame count plus fractional tick for high-refresh presentation; spray and water share the clock. Deterministic simulation is untouched.
+
+The moving boat previously included a static painted wake, and the six live sighting sprites were circular illustrated scenes with fixed land/water/spray. Offline reproducible asset authoring now extracts the boat and six transparent subjects. The Sightings Book retains its original illustrated atlas. The water/spray/wake remain separate animations.
+
+Spawn selection is now kind-first, with explicit approved-art habitats: whale/jellyfish/ferry on open water; seal on nearshore rock; owl on cliff; shooting star in sky. Aquatic sightings rise across 48 ticks, with waterline cropping and separately animated spray; departing sightings submerge. Notice, chase, progress, saved book/log, crossing speeds and beam difficulty remain unchanged.
+
+New acceptance gates: 600-seed habitat regression; 48-tick emergence regression; sub-frame shader clock precision; offline transparency and water-domain assertions; unchanged layered-rock checks. Real hardware 60/120 Hz pacing, whole-night visual UAT, child UAT and final artistic sign-off remain open.

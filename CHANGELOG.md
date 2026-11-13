@@ -18,3 +18,9 @@ This is **not** a certified public release; final graphical and hardware gates a
 - Shortened and progressively enlivened crossings, narrowed beam tracking and rescheduled bells.
 - Added reproducible offline art-bake and pixel-immutability acceptance tests.
 - Kept the full original product scope; 60/120 Hz performance and human visual UAT remain outstanding.
+
+## v0.4.0-uat — Graphics remediation
+- Fixed frozen ocean clock (float32 Unix epoch quantisation).
+- Isolated moving boat from painted wake; separated animated sea foam.
+- Added six clean live sighting sprites, correct habitats and emerging water animals.
+- Preserved approved boat challenge and gameplay engine; new tests and offline asset bake.

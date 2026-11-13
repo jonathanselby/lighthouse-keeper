@@ -613,3 +613,13 @@ The beam is the attention, the boat is the task, the sightings are the world bei
 **Tracking retune:** the fully-lit target begins at 3,300 ticks (55 seconds), decreases by 150 ticks per crossing and 65 ticks per completed night up to night 10, capped at 1,950 ticks; unlit multiplier has lower bound 0.40. Beam half-width progresses from 9° to 6.5°. More curved Bezier controls still lie within the original angular limits. Guaranteed check-in slots now ring at 15–28 seconds, preserving two to three per night even with shorter crossings. The original five-crossing, no-failure, Book, Log, local save and Keeper's Bell contracts are unchanged.
 
 **Evidence:** automated headless Go regression and offline art/motion checks are mandatory; CI full Go 1.25, graphical shader compilation, Linux release build, actual night capture, human visual approval and native 60/120 Hz fluidity remain separate release gates. Never infer hardware frame pacing from Xvfb.
+
+## v0.4 UAT graphics remediation — 13 November 2026
+
+The prior build's shader passed absolute Unix epoch seconds (about 1.8 billion) into a float32 uniform, which quantises time in roughly 128-second increments and freezes waves. The GPU clock now uses relative 60 TPS frame count plus fractional tick for high-refresh presentation; spray and water share the clock. Deterministic simulation is untouched.
+
+The moving boat previously included a static painted wake, and the six live sighting sprites were circular illustrated scenes with fixed land/water/spray. Offline reproducible asset authoring now extracts the boat and six transparent subjects. The Sightings Book retains its original illustrated atlas. The water/spray/wake remain separate animations.
+
+Spawn selection is now kind-first, with explicit approved-art habitats: whale/jellyfish/ferry on open water; seal on nearshore rock; owl on cliff; shooting star in sky. Aquatic sightings rise across 48 ticks, with waterline cropping and separately animated spray; departing sightings submerge. Notice, chase, progress, saved book/log, crossing speeds and beam difficulty remain unchanged.
+
+New acceptance gates: 600-seed habitat regression; 48-tick emergence regression; sub-frame shader clock precision; offline transparency and water-domain assertions; unchanged layered-rock checks. Real hardware 60/120 Hz pacing, whole-night visual UAT, child UAT and final artistic sign-off remain open.

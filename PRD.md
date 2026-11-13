@@ -122,7 +122,7 @@ When the boat is outside the beam, fog gathers around it and it slows to a drift
 
 ### FR4 — Sightings
 
-At irregular moments a sighting appears near the edge of the sea, lingers for several seconds and leaves. Kinds include a whale spout, a shooting star, a seal on a rock, glowing jellyfish, an owl on the cliff and a passing ferry.
+At irregular moments a sighting appears in its correct habitat and enters over a short animated interval. A whale and glowing jellyfish emerge from open water, a seal rises at the nearshore rocks, an owl perches on the cliff, a shooting star crosses the sky, and a ferry travels on the sea. No sea animal may appear on land or carry a static ocean/spray background in its moving sprite.
 
 - **Notice:** pressing N while a sighting is visible waves the keeper's lantern at it and logs it in the Sightings Book. The beam does not move. A new kind earns a new page.
 - **Chase:** if the beam is pointed at a sighting for more than one second while the boat is unlit, the sighting shyly leaves without being logged.
@@ -170,7 +170,7 @@ A persistent log with one row per night: date, prediction, lanterns lit, came-ba
 The finished game must feel professionally art-directed and finished: layered hand-painted storybook seascapes, detailed lighthouse and harbour, deep indigo/teal night water, warm amber light, luminous moon and stars, gentle mist, original expressive sightings, elegant illustrated books and restrained UI. The art should match the ambition of the five approved visual concept examples, without reproducing any unrelated game's protected artwork.
 
 - The **lighthouse, boat and sighting** are distinct, legible objects. Keep the playable sea visually open; intricate rocks, flowers, cottages and harbour details frame the action, rather than obscure it.
-- The beam moves continuously with its source, with a soft edge and plausible light on the boat/water. Fog gathers and clears smoothly; water and mist move without visible loops or sudden jumps.
+- The beam moves continuously with its source, with a soft edge and plausible light on the boat/water. Fog gathers and clears smoothly; water and mist move without visible loops or sudden jumps. The GPU water clock uses relative high-precision presentation time, never Unix epoch seconds rounded to float32. The moving boat contains no painted wake; wake foam is independently animated.
 - The six sightings have clear identities and a delightful appearance/notice/leave animation; they remain appealing enough to tempt attention without becoming flashing or frantic.
 - Lit harbour windows visibly accumulate during the night, matching the five crossing lanterns. The Book, prediction picker, Harbour Log, Rest and Keeper's Bell share the same premium visual language.
 - All screen transitions, overlay entrances, page turns and feedback use short, consistent easing; no stutters, hard cuts where a soft transition is appropriate, text jitter or distracting rapid motion.

@@ -71,3 +71,13 @@ Name the hardware, display refresh/resolution, OS, actual measured FPS/TPS and f
 - [Art bake run 43327777298](https://github.com/jonathanselby/lighthouse-keeper/actions/runs/43327777298) **passed** and committed regenerated binary artwork to main.
 - [Native release candidate run 43327777251](https://github.com/jonathanselby/lighthouse-keeper/actions/runs/43327777251) **passed**, including Kage shader startup under Xvfb and published a Linux x86-64 artifact. Xvfb is a virtual-display startup check, not sustained 60/120 Hz hardware evidence.
 - This does **not** close visual acceptance: still need full moving-scene capture from native executable, beam/boat tracking correspondence, art review across all rocks and foam, hardware FPS, child UAT and full session acceptance. Keep the build labelled candidate.
+
+## v0.4 UAT graphics remediation — 13 November 2026
+
+The prior build's shader passed absolute Unix epoch seconds (about 1.8 billion) into a float32 uniform, which quantises time in roughly 128-second increments and freezes waves. The GPU clock now uses relative 60 TPS frame count plus fractional tick for high-refresh presentation; spray and water share the clock. Deterministic simulation is untouched.
+
+The moving boat previously included a static painted wake, and the six live sighting sprites were circular illustrated scenes with fixed land/water/spray. Offline reproducible asset authoring now extracts the boat and six transparent subjects. The Sightings Book retains its original illustrated atlas. The water/spray/wake remain separate animations.
+
+Spawn selection is now kind-first, with explicit approved-art habitats: whale/jellyfish/ferry on open water; seal on nearshore rock; owl on cliff; shooting star in sky. Aquatic sightings rise across 48 ticks, with waterline cropping and separately animated spray; departing sightings submerge. Notice, chase, progress, saved book/log, crossing speeds and beam difficulty remain unchanged.
+
+New acceptance gates: 600-seed habitat regression; 48-tick emergence regression; sub-frame shader clock precision; offline transparency and water-domain assertions; unchanged layered-rock checks. Real hardware 60/120 Hz pacing, whole-night visual UAT, child UAT and final artistic sign-off remain open.
