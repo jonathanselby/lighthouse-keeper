@@ -107,3 +107,5 @@ func presentationClock(ticks uint64, fractionalTick float64) float32 {
 func (a *app) presentationClock() float32 {
 	return presentationClock(a.frame, a.subTick())
 }
+
+// UAT v0.4: relative time is shared by water, spray, wake and sightings.
