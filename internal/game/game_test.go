@@ -494,35 +494,54 @@ func TestUATBeamNarrowerThanOriginal(t *testing.T) {
 }
 
 func TestSightingHabitatsMatchApprovedPainting(t *testing.T) {
- counts:=[KindCount]int{}
- for seed:=int64(0);seed<600;seed++ {
-  g:=startTestNight(seed)
-  for kind:=Kind(0);kind<KindCount;kind++ {
-   for j:=0;j<20;j++ {
-    p:=g.sightingPosition(kind)
-    ok:=false
-    switch kind {
-    case Whale,Jellyfish: ok=p.X>=415&&p.X<=755&&p.Y>=205&&p.Y<=450
-    case Seal: ok=p.X>=240&&p.X<=320&&p.Y>=510&&p.Y<=565
-    case Ferry: ok=p.X>=540&&p.X<=780&&p.Y>=215&&p.Y<=425
-    case Owl: ok=p.X>=65&&p.X<=140&&p.Y>=160&&p.Y<=300
-    case ShootingStar: ok=p.X>=330&&p.X<=720&&p.Y>=20&&p.Y<=90
-    }
-    if !ok {t.Fatalf("wrong habitat %d %+v",kind,p)}
-   }
-  }
-  g.Night.Sightings=g.Night.Sightings[:0]
-  g.spawnSighting()
-  if len(g.Night.Sightings)==1 {counts[g.Night.Sightings[0].Kind]++}
- }
- for kind,n:=range counts {if n<5 {t.Fatalf("kind %d insufficient: %d",kind,n)}}
+	counts := [KindCount]int{}
+	for seed := int64(0); seed < 600; seed++ {
+		g := startTestNight(seed)
+		for kind := Kind(0); kind < KindCount; kind++ {
+			for j := 0; j < 20; j++ {
+				p := g.sightingPosition(kind)
+				ok := false
+				switch kind {
+				case Whale, Jellyfish:
+					ok = p.X >= 415 && p.X <= 755 && p.Y >= 205 && p.Y <= 450
+				case Seal:
+					ok = p.X >= 240 && p.X <= 320 && p.Y >= 510 && p.Y <= 565
+				case Ferry:
+					ok = p.X >= 540 && p.X <= 780 && p.Y >= 215 && p.Y <= 425
+				case Owl:
+					ok = p.X >= 65 && p.X <= 140 && p.Y >= 160 && p.Y <= 300
+				case ShootingStar:
+					ok = p.X >= 330 && p.X <= 720 && p.Y >= 20 && p.Y <= 90
+				}
+				if !ok {
+					t.Fatalf("wrong habitat %d %+v", kind, p)
+				}
+			}
+		}
+		g.Night.Sightings = g.Night.Sightings[:0]
+		g.spawnSighting()
+		if len(g.Night.Sightings) == 1 {
+			counts[g.Night.Sightings[0].Kind]++
+		}
+	}
+	for kind, n := range counts {
+		if n < 5 {
+			t.Fatalf("kind %d insufficient: %d", kind, n)
+		}
+	}
 }
 func TestSightingEmergenceRequiresTime(t *testing.T) {
- g:=startTestNight(17)
- g.Night.NextSighting=999999
- g.Night.Sightings=[]Sighting{{Kind:Whale,Age:0,Life:600,State:Appearing,Pos:Point{500,300}}}
- for i:=0;i<47;i++ {g.updateSightings(false)}
- if g.Night.Sightings[0].State!=Appearing {t.Fatal("whale popped in early")}
- g.updateSightings(false)
- if g.Night.Sightings[0].State!=Visible {t.Fatal("whale failed to emerge")}
+	g := startTestNight(17)
+	g.Night.NextSighting = 999999
+	g.Night.Sightings = []Sighting{{Kind: Whale, Age: 0, Life: 600, State: Appearing, Pos: Point{500, 300}}}
+	for i := 0; i < 47; i++ {
+		g.updateSightings(false)
+	}
+	if g.Night.Sightings[0].State != Appearing {
+		t.Fatal("whale popped in early")
+	}
+	g.updateSightings(false)
+	if g.Night.Sightings[0].State != Visible {
+		t.Fatal("whale failed to emerge")
+	}
 }

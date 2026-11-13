@@ -100,10 +100,10 @@ func (a *app) drawWake(dst *ebiten.Image, x, y float64, sec float64) {
 	a.drawOneImpact(dst, s, sec)
 }
 
- // Relative presentation time retains subframe precision, unlike epoch seconds.
- func presentationClock(ticks uint64, fractionalTick float64) float32 {
-     return float32((float64(ticks)+fractionalTick)/60)
- }
- func (a *app) presentationClock() float32 {
-     return presentationClock(a.frame,a.subTick())
- }
+// Relative presentation time retains subframe precision, unlike epoch seconds.
+func presentationClock(ticks uint64, fractionalTick float64) float32 {
+	return float32((float64(ticks) + fractionalTick) / 60)
+}
+func (a *app) presentationClock() float32 {
+	return presentationClock(a.frame, a.subTick())
+}

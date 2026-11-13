@@ -107,17 +107,23 @@ func TestLivingOceanArtLayerDimensions(t *testing.T) {
 }
 
 func TestWaterShaderClockHasSubFramePrecision(t *testing.T) {
- for _,ticks:=range []uint64{0,60,3600,216000} {
-  a,b,c:=presentationClock(ticks,0),presentationClock(ticks,.5),presentationClock(ticks+1,0)
-  if !(a<b&&b<c) {t.Fatalf("frozen shader at %d: %f %f %f",ticks,a,b,c)}
- }
+	for _, ticks := range []uint64{0, 60, 3600, 216000} {
+		a, b, c := presentationClock(ticks, 0), presentationClock(ticks, .5), presentationClock(ticks+1, 0)
+		if !(a < b && b < c) {
+			t.Fatalf("frozen shader at %d: %f %f %f", ticks, a, b, c)
+		}
+	}
 }
 func TestWaterSightingEmergenceIsContinuous(t *testing.T) {
- previous:=-1.0
- for age:=0;age<=48;age++ {
-  p:=emergenceProgress(game.Sighting{State:game.Appearing,Age:age})
-  if p<previous||p<0||p>1 {t.Fatalf("jump %d %f",age,p)}
-  previous=p
- }
- if previous!=1 {t.Fatal("did not finish")}
+	previous := -1.0
+	for age := 0; age <= 48; age++ {
+		p := emergenceProgress(game.Sighting{State: game.Appearing, Age: age})
+		if p < previous || p < 0 || p > 1 {
+			t.Fatalf("jump %d %f", age, p)
+		}
+		previous = p
+	}
+	if previous != 1 {
+		t.Fatal("did not finish")
+	}
 }
