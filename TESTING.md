@@ -81,3 +81,7 @@ The moving boat previously included a static painted wake, and the six live sigh
 Spawn selection is now kind-first, with explicit approved-art habitats: whale/jellyfish/ferry on open water; seal on nearshore rock; owl on cliff; shooting star in sky. Aquatic sightings rise across 48 ticks, with waterline cropping and separately animated spray; departing sightings submerge. Notice, chase, progress, saved book/log, crossing speeds and beam difficulty remain unchanged.
 
 New acceptance gates: 600-seed habitat regression; 48-tick emergence regression; sub-frame shader clock precision; offline transparency and water-domain assertions; unchanged layered-rock checks. Real hardware 60/120 Hz pacing, whole-night visual UAT, child UAT and final artistic sign-off remain open.
+
+## v0.4 bake and formatting verification
+
+Offline cut-outs and Go formatting were committed by the reproducible GitHub art-bake workflow. The final commit must be independently validated by CI and the native Linux release workflow. Do not substitute previous failed runs for current acceptance.
