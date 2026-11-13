@@ -85,3 +85,9 @@ New acceptance gates: 600-seed habitat regression; 48-tick emergence regression;
 ## v0.4 bake and formatting verification
 
 Offline cut-outs and Go formatting were committed by the reproducible GitHub art-bake workflow. The final commit must be independently validated by CI and the native Linux release workflow. Do not substitute previous failed runs for current acceptance.
+
+## v0.4 verified CI and native build — 13 November 2026
+
+Commit `d177ef99307c4c057b26bf48261dbe9aad4718a8` passed [CI 43339549074](https://github.com/jonathanselby/lighthouse-keeper/actions/runs/43339549074), including Go race/unit tests, new water-clock precision and habitat tests, offline moving-subject art checks, fixed rock regression, Linux amd64 and arm64 compilation. The [native Linux release workflow 43339549011](https://github.com/jonathanselby/lighthouse-keeper/actions/runs/43339549011) passed including graphical startup and published artifact `Lighthouse-Keeper-v0.4.0-uat-linux-x86_64`. The separate art bake [43339438643](https://github.com/jonathanselby/lighthouse-keeper/actions/runs/43339438643) passed and committed reproducible binary cut-outs.
+
+These technical checks do not replace human visual UAT. Actual GPU ocean motion over a sustained crossing, live animal surfacing/occlusion, all sighting habitats, 60/120 Hz frame pacing and child acceptance remain open.
