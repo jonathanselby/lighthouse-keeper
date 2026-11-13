@@ -30,11 +30,14 @@ jobs:
           python assets-source/test_living_ocean.py
           python assets-source/bake_moving_subjects.py
           python assets-source/test_moving_subjects.py
+      - name: Format changed Go sources
+        run: gofmt -w cmd/lighthousekeeper/living_ocean.go cmd/lighthousekeeper/render.go cmd/lighthousekeeper/main.go cmd/lighthousekeeper/sightings_live.go cmd/lighthousekeeper/assets_test.go internal/game/sightings.go internal/game/game_test.go
       - name: Publish baked binaries (no browser upload)
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add cmd/lighthousekeeper/living_ocean.go cmd/lighthousekeeper/render.go cmd/lighthousekeeper/main.go cmd/lighthousekeeper/sightings_live.go cmd/lighthousekeeper/assets_test.go internal/game/sightings.go internal/game/game_test.go
           git add cmd/lighthousekeeper/assets/seascape.jpg \
             cmd/lighthousekeeper/assets/water-domain.png \
             cmd/lighthousekeeper/assets/shore-fixed.png \
