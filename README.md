@@ -88,6 +88,16 @@ The sea is one painterly painting animated by a bounded GPU water shader. Origin
 
 **For developers:** Original ocean art is reproduced from `assets-source/approved-ocean-study.png` by `python assets-source/bake_living_ocean.py` (Python/Pillow/NumPy/OpenCV are only needed to author assets). The binary runtime art is also baked and checked by GitHub Actions. The shipped Linux executable remains offline and needs no Python, packages, internet access or service.
 
-### v0.4 UAT graphics candidate
+### v0.4 accepted Garage baseline
 
-The moving ocean shader now uses relative presentation time, with separate fixed rocks and animated spray. Boat and sighting sprites contain no painted sea; the Sightings Book remains illustrated. Water animals emerge from approved open-water positions; seal, owl and shooting star use their intended habitats. Final visual and hardware UAT is still required.
+The moving ocean shader now uses relative presentation time, with separate fixed rocks and animated spray. Boat and sighting sprites contain no painted sea; the Sightings Book remains illustrated. Water animals emerge from approved open-water positions; seal, owl and shooting star use their intended habitats. Owner accepted the result on 16 November 2026. Native 60/120 Hz frame-time measurement and independent child/homework UAT were not recorded as completed.
+
+## Owner acceptance — 16 November 2026
+
+**Decision:** Lighthouse Keeper v0.4 is accepted as complete for the agreed Garage game scope. The owner reviewed the revised graphics and gameplay and confirmed, “Good enough, let's lock this in as complete.” This closes the current UAT feedback cycle. No further graphics or boat-difficulty changes are required for this accepted baseline.
+
+**Accepted implementation:** living GPU ocean with a relative presentation clock; stationary layered rocks; independent moving spray and wake; boat artwork without baked waves; habitat-specific sightings with emergence animations; improved boat challenge; existing five-crossing, Sightings Book, Harbour Log and Keeper's Bell mechanics.
+
+**Evidence:** [CI passed](https://github.com/jonathanselby/lighthouse-keeper/actions/runs/43339549074), [native Linux release candidate build and graphical smoke passed](https://github.com/jonathanselby/lighthouse-keeper/actions/runs/43339549011), and [offline art bake passed](https://github.com/jonathanselby/lighthouse-keeper/actions/runs/43339438643). Accepted build source: `d177ef99307c4c057b26bf48261dbe9aad4718a8`; Linux artifact: `Lighthouse-Keeper-v0.4.0-uat-linux-x86_64`.
+
+**Evidence boundary:** Owner acceptance is not a measured 60/120 Hz frame-pacing result or an independent child/homework-session test. Those checks were not recorded as passed; they are retained as historical unverified quality gates, not blockers to this owner-approved closure. The existing Linux artifact keeps its `-uat` filename; no new binary or public release/tag is asserted.

@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.4 — Owner-accepted Garage baseline (16 November 2026)
+
+Owner accepted the v0.4 Linux game as complete after final graphics UAT. The build fixes frozen water, removes the boat's baked wake, and adds habitat-specific emerging sightings, while retaining fixed rock layers, independently animated spray, improved boat tracking and the original gameplay. CI, art bake and native Linux smoke passed; measured hardware FPS and independent child/homework tests were not claimed. This acceptance is not a newly published GitHub release.
+
 ## Unreleased — Lighthouse Keeper v0.1.0 implementation candidate
 
 - Implemented the five-crossing deterministic attention game, sightings, bell check-ins and local book/log.

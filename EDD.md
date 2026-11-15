@@ -1,7 +1,7 @@
 # Lighthouse Keeper — Engineering Design Document
 
 **Version:** 0.3 (Garage simplification review + premium visual design)
-**Status:** Locked engineering baseline for V0.1.0; initial implementation candidate, integration/performance/UAT evidence pending
+**Status:** Locked engineering baseline; v0.4 implementation owner-approved as complete (16 November 2026). Hardware FPS and independent child/homework tests remain unverified.
 **Implementation:** Go 1.25+, Ebitengine 2.10.6 (pinned)
 **Product source:** Lighthouse Keeper PRD v0.3 (FR1–FR16, AC1–AC21)
 **Review source:** https://github.com/jonathanselby/engineering-under-constraints — `METHODOLOGY.md`, `principles/modern-software.md`, `principles/constraint-review.md`, `c64/lessons.md`
@@ -623,3 +623,13 @@ The moving boat previously included a static painted wake, and the six live sigh
 Spawn selection is now kind-first, with explicit approved-art habitats: whale/jellyfish/ferry on open water; seal on nearshore rock; owl on cliff; shooting star in sky. Aquatic sightings rise across 48 ticks, with waterline cropping and separately animated spray; departing sightings submerge. Notice, chase, progress, saved book/log, crossing speeds and beam difficulty remain unchanged.
 
 New acceptance gates: 600-seed habitat regression; 48-tick emergence regression; sub-frame shader clock precision; offline transparency and water-domain assertions; unchanged layered-rock checks. Real hardware 60/120 Hz pacing, whole-night visual UAT, child UAT and final artistic sign-off remain open.
+
+## Owner acceptance — 16 November 2026
+
+**Decision:** Lighthouse Keeper v0.4 is accepted as complete for the agreed Garage game scope. The owner reviewed the revised graphics and gameplay and confirmed, “Good enough, let's lock this in as complete.” This closes the current UAT feedback cycle. No further graphics or boat-difficulty changes are required for this accepted baseline.
+
+**Accepted implementation:** living GPU ocean with a relative presentation clock; stationary layered rocks; independent moving spray and wake; boat artwork without baked waves; habitat-specific sightings with emergence animations; improved boat challenge; existing five-crossing, Sightings Book, Harbour Log and Keeper's Bell mechanics.
+
+**Evidence:** [CI passed](https://github.com/jonathanselby/lighthouse-keeper/actions/runs/43339549074), [native Linux release candidate build and graphical smoke passed](https://github.com/jonathanselby/lighthouse-keeper/actions/runs/43339549011), and [offline art bake passed](https://github.com/jonathanselby/lighthouse-keeper/actions/runs/43339438643). Accepted build source: `d177ef99307c4c057b26bf48261dbe9aad4718a8`; Linux artifact: `Lighthouse-Keeper-v0.4.0-uat-linux-x86_64`.
+
+**Evidence boundary:** Owner acceptance is not a measured 60/120 Hz frame-pacing result or an independent child/homework-session test. Those checks were not recorded as passed; they are retained as historical unverified quality gates, not blockers to this owner-approved closure. The existing Linux artifact keeps its `-uat` filename; no new binary or public release/tag is asserted.
